@@ -1,0 +1,61 @@
+#!/bin/bash
+# Time-stamp: <2021-03-12 23:42:35 martin>
+
+JIDEA_HOME=$HOME/.local/opt/jetbrains/idea-IU
+
+# we do not want anything else (even Java) in the PATH
+PATH=/usr/local/bin:/usr/bin:/bin
+export PATH
+
+#
+# java virtual machine of choice
+#
+
+. ~/bin/env-jdk-openjdk-11.sh
+vm="$JAVA_HOME/bin/java"
+echo "I: vm=${vm}"
+
+#
+# memory
+#
+
+max_jvm_memory=4g
+echo "I: max_jvm_memory=${max_jvm_memory}"
+
+#
+# scaling on hi-res displays -- use sun.java2d.uiScale below
+#
+
+# https://intellij-support.jetbrains.com/hc/en-us/articles/360007994999-HiDPI-configuration
+unset GDK_SCALE
+unset GDK_DPI_SCALE
+
+export GDK_SCALE=0.8
+export GDK_DPI_SCALE=0.8
+
+#
+# executing command
+#
+
+export IDEA_VM_OPTIONS=/tmp/$USER-$(id -u)_idea_ultimate.vmoptions
+
+cat > $IDEA_VM_OPTIONS <<EOF
+-XX:ReservedCodeCacheSize=256m
+-XX:+UseCodeCacheFlushing
+-XX:-UseLargePages
+-ea
+-Xms${max_jvm_memory}
+-Xmx${max_jvm_memory}
+-Dsun.io.useCanonCaches=false
+-Djava.net.preferIPv4Stack=true
+-Djava.library.path=/usr/lib/jni:/usr/lib/x86_64-linux-gnu/jni
+-Duser.name=martin.slouf
+-Dswing.aatext=true
+-Dawt.useSystemAAFontSettings=lcd
+-Dsun.java2d.uiScale.enabled=true
+-Dsun.java2d.uiScale=1.0
+EOF
+
+cat $IDEA_VM_OPTIONS
+
+$JIDEA_HOME/bin/idea.sh

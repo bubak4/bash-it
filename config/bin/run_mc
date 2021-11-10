@@ -1,0 +1,16 @@
+#!/bin/bash
+# Time-stamp: < run_mc (2019-08-25 03:28) >
+
+# starts Midnight Commander in new terminal window
+# suitable for udiskie package to browse files in X
+
+# instead of starting the shell in interactive mode ('#!/bin/bash -i')
+# which is slow duplicate some env setup
+
+for i in 00-env.bash editor.bash ; do
+    if test -f ~/.bash-it/custom/$i ; then
+        . ~/.bash-it/custom/$i
+    fi
+done
+
+RUN_MC=1 x-terminal-emulator -e mc "$@"

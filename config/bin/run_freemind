@@ -1,0 +1,10 @@
+#!/bin/bash
+# Time-stamp: <2021-03-12 23:46:04 martin>
+
+tmp_dir=/tmp/freemind
+mkdir $tmp_dir
+cd $tmp_dir
+
+. ~/bin/env-jdk-openjdk-11.sh
+
+sh $HOME/.local/opt/freemind/freemind.sh

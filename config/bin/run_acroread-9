@@ -1,0 +1,4 @@
+#!/bin/sh
+# Time-stamp: < run_acroread-9 (2017-10-04 20:43) >
+
+schroot -c jessie-i386 /opt/Adobe/Reader9/bin/acroread "$@"

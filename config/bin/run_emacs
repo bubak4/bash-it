@@ -1,0 +1,24 @@
+#!/bin/bash
+# Time-stamp: < run_emacs (2019-08-25 03:30) >
+
+EDITOR_CMD=vi
+
+if which $ALTERNATE_EDITOR >/dev/null 2>&1 ; then
+    EDITOR_CMD=$ALTERNATE_EDITOR;
+fi
+
+if pgrep -U $USER emacs >/dev/null 2>&1 ; then
+    if test -x ~/.local/opt/emacs-latest/bin/emacs ; then
+        export EMACS_CMD=~/.local/opt/emacs-latest/bin/emacs
+    else
+        export EMACS_CMD=emacs
+    fi
+    TMP=$EDITOR_CMD
+    EDITOR_CMD="${EMACS_CMD}client --create-frame --alternate-editor=$TMP"
+    if test -n "$MC_SID" -o -n "$RUN_MC" ; then
+        EDITOR_CMD="${EMACS_CMD}client --tty --alternate-editor=$TMP"
+    fi
+fi
+
+logger "$EDITOR_CMD"
+$EDITOR_CMD "$@"

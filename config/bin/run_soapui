@@ -1,0 +1,23 @@
+#!/bin/bash
+# Time-stamp: <2021-03-12 23:43:40 martin>
+
+. ~/bin/env-jdk-openjdk-11.sh
+
+# slight change of /opt/local/app/SoapUI-5.2.1/bin/soapui.sh is required in
+# order to accept external JAVA_OPTS
+JAVA_OPTS="-Djavax.net.debug=all"
+# must be set for https://www.ispop.cz/ as it supports only TLSv1, JDK
+# defaults to latest TLS (TLSv1.2), but protocol downgrade is
+# non-negotiable via SSL
+JAVA_OPTS="$JAVA_OPTS "-Dhttps.protocols="TLSv1"
+JAVA_OPTS="$JAVA_OPTS "-Djdk.tls.client.protocols="TLSv1"
+
+# better fonts
+JAVA_OPTS="$JAVA_OPTS -Dswing.aatext=true"
+JAVA_OPTS="$JAVA_OPTS -Dawt.useSystemAAFontSettings=lcd"
+
+export JAVA_OPTS
+
+SOAPUI_HOME=$HOME/.local/opt/SoapUI-5.2.1
+export SOAPUI_HOME
+/bin/sh $SOAPUI_HOME/bin/soapui.sh

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Time-stamp: < run_firefox (2019-08-04 09:14) >
+
+if test -x ~/.local/opt/firefox/firefox ; then
+    ~/.local/opt/firefox/firefox "$@"
+else
+    firefox "$@"
+fi

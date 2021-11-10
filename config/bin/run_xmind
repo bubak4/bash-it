@@ -1,0 +1,8 @@
+#!/bin/bash
+# Time-stamp: <2021-03-12 23:43:53 martin>
+
+. ~/bin/env-jdk-openjdk-11.sh
+
+XMIND_HOME=$HOME/.local/opt/xmind/XMind_amd64
+cd $XMIND_HOME
+./XMind

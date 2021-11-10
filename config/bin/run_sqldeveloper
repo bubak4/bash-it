@@ -1,0 +1,19 @@
+#!/bin/bash
+# Time-stamp: < run_sqldeveloper (2019-10-03 10:11) >
+
+# clear JDK
+CLASSPATH=""
+export CLASSPATH
+. ~/bin/env_jdk-1.8.sh
+
+JAVA_HOME=${JAVA_HOME}/
+JDK_HOME=$JAVA_HOME
+cat > ${HOME}/.sqldeveloper/jdk <<EOF
+$JDK_HOME
+EOF
+
+# just print out files with predefined db connections
+find ${HOME}/.sqldeveloper/ -name "connections.xml"
+
+cd /opt/oracle/sqldeveloper
+/bin/sh sqldeveloper.sh "$@"

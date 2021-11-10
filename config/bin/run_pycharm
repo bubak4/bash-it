@@ -1,0 +1,50 @@
+#!/bin/bash
+# Time-stamp: <2021-11-10 20:36:35 martin>
+
+PYCHARM_HOME=$HOME/.local/opt/jetbrains/pycharm
+
+# we do not want anything else (even Java) in the PATH
+PATH=/usr/local/bin:/usr/bin:/bin
+export PATH
+
+#
+# java virtual machine of choice
+#
+
+. ~/bin/env-jdk-openjdk-11.sh
+vm="$JAVA_HOME/bin/java"
+echo "I: vm=${vm}"
+
+#
+# memory
+#
+
+max_jvm_memory=2g
+echo "I: max_jvm_memory=${max_jvm_memory}"
+
+#
+# executing command
+#
+
+export PYCHARM_VM_OPTIONS=/tmp/$USER-`id -u`_pycharm.vmoptions
+
+cat > $PYCHARM_VM_OPTIONS <<EOF
+-XX:ReservedCodeCacheSize=256m
+-XX:+UseCodeCacheFlushing
+-XX:-UseLargePages
+-ea
+-Xms${max_jvm_memory}
+-Xmx${max_jvm_memory}
+-Dsun.io.useCanonCaches=false
+-Djava.net.preferIPv4Stack=true
+-Djava.library.path=/usr/lib/jni:/usr/lib/x86_64-linux-gnu/jni
+-Duser.name=martin.slouf
+-Dswing.aatext=true
+-Dawt.useSystemAAFontSettings=lcd
+EOF
+
+# hack for debug: https://youtrack.jetbrains.com/issue/PY-44384
+export PYDEVD_USE_CYTHON=NO
+export PYDEVD_USE_FRAME_EVAL=NO
+
+$PYCHARM_HOME/bin/pycharm.sh

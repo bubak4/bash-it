@@ -1,0 +1,13 @@
+#!/bin/bash
+# Time-stamp: <2021-03-12 23:42:49 martin>
+
+MD_HOME=~/.local/opt/magicdraw-uml
+
+properties=$(find $MD_HOME -name "magicdraw.properties")
+
+echo "I: change $properties if required"
+echo "I: licence keys found:"
+ls -1 $MD_HOME/*key.lic $MD_HOME/*key.txt 2>/dev/null
+
+. ~/bin/env-jdk-openjdk-11.sh
+$MD_HOME/bin/magicdraw

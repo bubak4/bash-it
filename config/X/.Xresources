@@ -1,0 +1,76 @@
+*background: gray20
+*foreground: linen
+
+!Black
+*color0:    gray20
+*color8:    gray40
+!Red
+*color1:    OrangeRed
+*color9:    red
+!Green
+*color2:    LawnGreen
+*color10:   GreenYellow
+!Yellow
+*color3:    orange
+*color11:   yellow
+!Blue
+*color4:    SlateBlue
+*color12:   CornflowerBlue
+!Magenta
+*color5:    LightPink
+*color13:   HotPink
+!Cyan
+*color6:    turquoise
+*color14:   cyan
+!White
+*color7:    linen
+*color15:   snow
+
+! - - - -
+
+Xft.dpi: 120
+Xft.autohint: 0
+Xft.lcdfilter: lcddefault
+Xft.hintstyle: hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+
+! - - - -
+
+!Emacs*font: DejaVu Sans Mono 11
+!Emacs*font: Source Code Pro 11
+Emacs*font: Anonymous Pro 11
+
+!XTerm*faceName: Droid Sans Mono
+XTerm*faceName: Anonymous Pro
+XTerm*faceSize: 11
+XTerm*locale: true
+XTerm*metaSendsEscape: true
+XTerm*cursorBlink: True
+XTerm*fullscreen: never
+XTerm*Maximized: true
+
+URxvt*transparent: True
+URxvt*shading: 15
+URxvt*font: xft:Anonymous Pro:antialias=true:size=11
+URxvt*boldFont: xft:Anonymous Pro:antialias=true:size=11:bold
+URxvt*italicFont: xft:Anonymous Pro:antialias=true:size=11:italic
+URxvt*scrollBar: False
+URxvt*cursorBlink: True
+URxvt*bordeLess: True
+URxvt.saveLines: 1000
+URxvt.iso14755: false
+URxvt.iso14755_52: false
+!! font-size: Ctrl++ 'increase', Ctrl+- 'decrease', Ctrl+0 'reset'
+URxvt*perl-ext-common: clipboard-osc,font-size,matcher,selection-to-clipboard
+URxvt.matcher.button: 2
+!URxvt.url-launcher: /usr/bin/xdg-open
+URxvt.url-launcher: /home/martin/.local/opt/firefox/firefox
+URxvt*geometry: 120x40
+URxvt*termName: rxvt-unicode
+!URxvt*termName: rxvt-unicode-256color
+!! https://wiki.archlinux.org/index.php/Rxvt-unicode#Scrollback_buffer_in_secondary_screen
+!URxvt.secondaryScreen: 1
+!URxvt.secondaryScroll: 0
+!URxvt.secondaryWheel: 1

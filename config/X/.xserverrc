@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# this file is not processed when logging in using xdm
+# (only '/etc/X11/xdm' is processed)
+
+exec X :0.0 dpms -allowMouseOpenFail

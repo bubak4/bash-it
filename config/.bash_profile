@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Time-stamp: <2021-11-10 16:50:34 martin>
+# Time-stamp: <2021-11-17 21:27:07 martin>
 
 # use maximum compatibility with sh,
 # this script may be processed by different interpreters than bash
 # (from .xprofile for example)
+
+SHELL=/bin/bash
+export SHELL
 
 LANG=cs_CZ.UTF-8
 LC_ALL=cs_CZ.UTF-8
@@ -29,9 +32,3 @@ if test -f ~/.bashrc ; then
     ssh-agent-start
     dune-fortune
 fi
-
-tmp=$(hostname)
-if test "$tmp" = "rypous" -o "$tmp" = "x390" ; then
-    calendar -A 14
-fi
-unset tmp

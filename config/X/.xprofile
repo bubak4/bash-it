@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Time-stamp: <2021-03-12 21:34:31 martin>
+# Time-stamp: <2021-11-17 21:54:06 martin>
 
 # shell environment (does not have to be processed by bash in this script)
 if test -f ~/.bash_profile ; then
@@ -55,7 +55,7 @@ else
 
         # start new instance of gnome-keyring-daemon
         if which gnome-keyring-daemon >/dev/null ; then
-            echo ".Fantomas8." | gnome-keyring-daemon --daemonize --unlock
+            eval $(cat ~/.install-secret | gnome-keyring-daemon --daemonize --unlock)
         fi
         xset -b # disable system beep
         xset +dpms && xset dpms 300

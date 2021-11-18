@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Time-stamp: <2021-11-18 03:26:24 martin>
+# Time-stamp: <2021-11-18 03:35:43 martin>
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 cd $SCRIPTPATH || exit 1
@@ -10,7 +10,13 @@ function safe_link() {
 	local target_dir=$(realpath $HOME/$(dirname $1))
 	local target=$target_dir/$(basename $1)
 	if test -L "$target" ; then
-		echo "$target link already exists"
+		if test -e "$target" ; then
+			echo "$target link already exists"
+		else
+			rm -f $target
+			ln -s $source $target
+			echo "$target link has been fixed"
+		fi
 	elif test -f "$target" ; then
 		mv $target $target.orig
 		ln -s $source $target

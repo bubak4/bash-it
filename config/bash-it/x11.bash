@@ -1,3 +1,8 @@
+# duplicate from 00-env.bash, in some rare cases, it may not be defined
+# (for example during X startup)
+# portable way to get system temp directory
+export TMPDIR=$(dirname $(mktemp -u))
+
 #######################
 # generic X utilities #
 #######################
@@ -114,7 +119,7 @@ function x-wallpaper()
         #local wallpaper=ritchey-p29er-1280x912.jpg
         #local wallpaper=ritchey-p29er-2880x1620-1080p.jpg
         local wallpaper=ritchey-SwissCross-4k-1080p.jpg
-        wallpaper=$BASH_IT/config/X/wallpapers/$wallpaper
+        wallpaper=$BASH_IT/config/etc-x/wallpapers/$wallpaper
     fi
     if test -f "$wallpaper" && which hsetroot >/dev/null ; then
         hsetroot -fill $wallpaper

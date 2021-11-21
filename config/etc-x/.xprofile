@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Time-stamp: <2021-11-17 21:54:06 martin>
+# Time-stamp: <2021-11-21 01:25:28 martin>
 
 # shell environment (does not have to be processed by bash in this script)
 if test -f ~/.bash_profile ; then
     . ~/.bash_profile
+    eval $(cat ~/.bashrc | fgrep -e BASH_IT=)
 fi
 
 # ensure custom Xresources are loaded
@@ -29,6 +30,10 @@ fi
 #    export QT_QPA_PLATFORM=wayland
 #fi
 
+if test -n "$BASH_IT" ; then
+    x11bash=$(find $BASH_IT/config -name x11.bash)
+fi
+
 # gnome does things differently
 if test "$XDG_SESSION_DESKTOP" = "gnome" -o "$XDG_SESSION_DESKTOP" = "gnome-xorg" ; then
     # I prefer this way to gnome 'autostart' feature
@@ -36,14 +41,13 @@ if test "$XDG_SESSION_DESKTOP" = "gnome" -o "$XDG_SESSION_DESKTOP" = "gnome-xorg
     sh -c "sleep 10 && flameshot" &
     if test "$XDG_SESSION_TYPE" = "x11" ; then
         # .xprofile may not be processed in bash, ensure the following commands are
-        if test -r ~/.bash-it/custom/x11.bash ; then
+        if test -r "$x11bash" ; then
             x_bash_script=$(mktemp x-profile-bash.XXXX.sh)
             cat > $x_bash_script <<EOF
 #!/usr/bin/env bash
-. ~/.bash-it/custom/x11.bash
+. $x11bash
 x-kb-thinkpad
 x-mouse
-DPI=120 x-dpi-apply
 EOF
             bash $x_bash_script
             rm $x_bash_script
@@ -55,7 +59,7 @@ else
 
         # start new instance of gnome-keyring-daemon
         if which gnome-keyring-daemon >/dev/null ; then
-            eval $(cat ~/.install-secret | gnome-keyring-daemon --daemonize --unlock)
+            eval export $(cat ~/.install-secret | gnome-keyring-daemon --daemonize --unlock)
         fi
         xset -b # disable system beep
         xset +dpms && xset dpms 300
@@ -70,16 +74,15 @@ else
         done
 
         # .xprofile may not be processed in bash, ensure the following commands are
-        if test -r ~/.bash-it/custom/x11.bash ; then
+        if test -r "$x11bash" ; then
             x_bash_script=$(mktemp x-profile-bash.XXXX.sh)
             cat > $x_bash_script <<EOF
 #!/usr/bin/env bash
-. ~/.bash-it/custom/x11.bash
+. $x11bash
 x-kb-thinkpad
 x-mouse
 x-touchpad-off
 x-wallpaper
-DPI=120 x-dpi-apply
 EOF
             bash $x_bash_script
             rm $x_bash_script

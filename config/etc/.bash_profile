@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Time-stamp: <2021-11-17 21:27:07 martin>
+# Time-stamp: <2021-11-21 01:02:01 martin>
 
 # use maximum compatibility with sh,
 # this script may be processed by different interpreters than bash
@@ -29,6 +29,5 @@ esac
 
 if test -f ~/.bashrc ; then
     . ~/.bashrc
-    ssh-agent-start
     dune-fortune
 fi

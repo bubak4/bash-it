@@ -1,1 +1,2 @@
-alias terraform="~/.local/opt/terraform"
+# terraform autocompletion
+which terraform >/dev/null && complete -C $(which terraform) terraform

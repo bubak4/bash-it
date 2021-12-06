@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2021-11-10 20:36:35 martin>
+# Time-stamp: <2021-12-07 00:07:29 martin>
 
 PYCHARM_HOME=$HOME/.local/opt/jetbrains/pycharm
 
@@ -19,7 +19,7 @@ echo "I: vm=${vm}"
 # memory
 #
 
-max_jvm_memory=2g
+max_jvm_memory=4g
 echo "I: max_jvm_memory=${max_jvm_memory}"
 
 #

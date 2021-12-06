@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2021-03-12 23:42:35 martin>
+# Time-stamp: <2021-12-07 00:07:13 martin>
 
 JIDEA_HOME=$HOME/.local/opt/jetbrains/idea-IU
 
@@ -19,7 +19,7 @@ echo "I: vm=${vm}"
 # memory
 #
 
-max_jvm_memory=4g
+max_jvm_memory=6g
 echo "I: max_jvm_memory=${max_jvm_memory}"
 
 #

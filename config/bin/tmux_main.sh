@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2021-11-17 00:56:53 martin>
+# Time-stamp: <2021-12-06 08:45:53 martin>
 
 tmux new-session -d -s main
 
@@ -16,8 +16,6 @@ which multitail && \
     tmux new-window -n syslogs -t main "sudo multitail --mergeall $logs"
 which htop && \
     tmux new-window -n htop -t main 'htop'
-which s-tui && \
-    tmux new-window -n cpu -t main 'sudo s-tui'
 
 tmux select-window -t main:2
 tmux attach-session -t main

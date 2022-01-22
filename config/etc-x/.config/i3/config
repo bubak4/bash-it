@@ -177,6 +177,8 @@ for_window [instance="pavucontrol" class="Pavucontrol"] floating enable
 for_window [instance="nm-connection-editor" class="Nm-connection-editor"] floating enable
 for_window [instance="gnome-calculator" class="Gnome-calculator"] floating enable
 for_window [instance="virt-manager" class="Virt-manager"] floating enable
+for_window [instance="VirtualBox Machine" class="VirtualBox Machine"] floating enable
+#for_window [instance="VirtualBox Manager" class="VirtualBox Manager"] floating enable
 
 bindsym $mod+m exec ~/bin/run_emacs
 bindsym $mod+n exec ~/bin/run_mc

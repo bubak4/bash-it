@@ -26,7 +26,9 @@ SCM_THEME_CURRENT_USER_SUFFIX=''
 SCM_THEME_CHAR_PREFIX=''
 SCM_THEME_CHAR_SUFFIX=''
 
-THEME_BATTERY_PERCENTAGE_CHECK=${THEME_BATTERY_PERCENTAGE_CHECK:=true}
+# Define this here so it can be used by all of the themes
+: "${THEME_CHECK_SUDO:=false}"
+: "${THEME_BATTERY_PERCENTAGE_CHECK:=true}"
 
 SCM_GIT_SHOW_DETAILS=${SCM_GIT_SHOW_DETAILS:=true}
 SCM_GIT_SHOW_REMOTE_INFO=${SCM_GIT_SHOW_REMOTE_INFO:=auto}
@@ -106,7 +108,7 @@ function _bash_it_appearance_scm_init() {
 		fi
 	fi
 }
-_bash_it_appearance_scm_init
+_bash_it_library_finalize_hook+=('_bash_it_appearance_scm_init')
 
 function scm {
 	if [[ "$SCM_CHECK" = false ]]; then
@@ -581,45 +583,8 @@ function aws_profile {
 	fi
 }
 
-function __check_precmd_conflict() {
-	local f
-	for f in "${precmd_functions[@]}"; do
-		if [[ "${f}" == "${1}" ]]; then
-			return 0
-		fi
-	done
-	return 1
-}
-
-function safe_append_prompt_command {
-	local prompt_re
-
-	if [ "${__bp_imported:-missing}" == "defined" ]; then
-		# We are using bash-preexec
-		if ! __check_precmd_conflict "${1}"; then
-			precmd_functions+=("${1}")
-		fi
-	else
-		# Set OS dependent exact match regular expression
-		if [[ ${OSTYPE} == darwin* ]]; then
-			# macOS
-			prompt_re="[[:<:]]${1}[[:>:]]"
-		else
-			# Linux, FreeBSD, etc.
-			prompt_re="\<${1}\>"
-		fi
-
-		if [[ ${PROMPT_COMMAND[*]:-} =~ ${prompt_re} ]]; then
-			return
-		elif [[ -z ${PROMPT_COMMAND} ]]; then
-			PROMPT_COMMAND="${1}"
-		else
-			PROMPT_COMMAND="${1};${PROMPT_COMMAND}"
-		fi
-	fi
-}
-
 function _save-and-reload-history() {
-	local autosave=${1:-0}
-	[[ $autosave -eq 1 ]] && history -a && history -c && history -r
+	local autosave="${1:-${HISTORY_AUTOSAVE:-0}}"
+	[[ ${autosave} -eq 1 ]] && local HISTCONTROL="${HISTCONTROL:-}${HISTCONTROL:+:}autoshare"
+	_bash-it-history-auto-save && _bash-it-history-auto-load
 }

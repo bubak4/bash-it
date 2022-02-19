@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: < run_emacs (2019-08-25 03:30) >
+# Time-stamp: <2022-02-19 11:03:33 martin>
 
 EDITOR_CMD=vi
 
@@ -7,7 +7,7 @@ if which $ALTERNATE_EDITOR >/dev/null 2>&1 ; then
     EDITOR_CMD=$ALTERNATE_EDITOR;
 fi
 
-if pgrep -U $USER emacs >/dev/null 2>&1 ; then
+if pgrep -U $(id -u) emacs >/dev/null 2>&1 ; then
     if test -x ~/.local/opt/emacs-latest/bin/emacs ; then
         export EMACS_CMD=~/.local/opt/emacs-latest/bin/emacs
     else

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2021-03-12 23:46:14 martin>
+# Time-stamp: <2022-02-19 11:02:43 martin>
 
 WEBSTORM_HOME=$HOME/.local/opt/jetbrains/WebStorm
 
@@ -26,7 +26,8 @@ echo "I: max_jvm_memory=${max_jvm_memory}"
 # executing command
 #
 
-export WEBSTORM_VM_OPTIONS=/tmp/$USER-`id -u`_webstorm.vmoptions
+user=$(id -un)-$(id -u)
+export WEBSTORM_VM_OPTIONS=/tmp/${user}_webstorm.vmoptions
 
 cat > $WEBSTORM_VM_OPTIONS <<EOF
 -XX:ReservedCodeCacheSize=256m

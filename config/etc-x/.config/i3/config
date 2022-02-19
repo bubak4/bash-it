@@ -178,7 +178,7 @@ for_window [instance="nm-connection-editor" class="Nm-connection-editor"] floati
 for_window [instance="gnome-calculator" class="Gnome-calculator"] floating enable
 for_window [instance="virt-manager" class="Virt-manager"] floating enable
 for_window [instance="VirtualBox Machine" class="VirtualBox Machine"] floating enable
-#for_window [instance="VirtualBox Manager" class="VirtualBox Manager"] floating enable
+for_window [instance="VirtualBox Manager" class="VirtualBox Manager"] floating enable
 
 bindsym $mod+m exec ~/bin/run_emacs
 bindsym $mod+n exec ~/bin/run_mc
@@ -217,3 +217,8 @@ bindsym $mod+BackSpace mode "pass-through"
 
 bindsym $mod+Tab focus right
 bindsym $mod+Shift+Tab focus left
+
+# move focused window to sratchpad workspace
+bindsym $mod+minus move scratchpad
+# show most recently 'scratchpadded window'
+bindsym $mod+Shift+minus scratchpad show

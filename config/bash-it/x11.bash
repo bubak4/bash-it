@@ -116,9 +116,10 @@ function x-wallpaper()
         #local wallpaper=sc2_zeratul-1920x1200.jpg
         #local wallpaper=kv_malaovecka-1100x728.jpg
         #local wallpaper=kv_ponociruzove-1100x766.jpg
+        local wallpaper=kv_nesusidodnanocisen-1100x723.jpg
         #local wallpaper=ritchey-p29er-1280x912.jpg
         #local wallpaper=ritchey-p29er-2880x1620-1080p.jpg
-        local wallpaper=ritchey-SwissCross-4k-1080p.jpg
+        #local wallpaper=ritchey-SwissCross-4k-1080p.jpg
         wallpaper=$BASH_IT/config/etc-x/wallpapers/$wallpaper
     fi
     if test -f "$wallpaper" && which hsetroot >/dev/null ; then

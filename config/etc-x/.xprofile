@@ -15,7 +15,7 @@ fi
 # allow access to X to anyone from my OS group
 chmod g+r ~/.Xauthority
 # allow access to selected local users
-for i in gamer root oracle basex hazelcast openam ; do
+for i in gamer root basex hazelcast openam ; do
     xhost +si:localuser:$i
 done
 
@@ -55,7 +55,7 @@ EOF
     fi
 else
     # ensure we are not on Wayland
-    if test "$XDG_SESSION_TYPE" = "x11" ; then
+    if test "$XDG_SESSION_TYPE" = "x11" -o "$XDG_SESSION_TYPE" = "tty" ; then
 
         # start new instance of gnome-keyring-daemon
         if which gnome-keyring-daemon >/dev/null ; then

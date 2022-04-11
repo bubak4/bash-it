@@ -33,6 +33,7 @@ lint_clean_files.sh
 #
 completion/available/apm.completion.bash
 completion/available/awless.completion.bash
+completion/available/awscli.completion.bash
 completion/available/bash-it.completion.bash
 completion/available/brew.completion.bash
 completion/available/cargo.completion.bash
@@ -76,7 +77,9 @@ completion/available/vuejs.completion.bash
 completion/available/wpscan.completion.bash
 
 # libraries
+lib/appearance.bash
 lib/colors.bash
+lib/command_duration.bash
 lib/helpers.bash
 lib/history.bash
 lib/log.bash
@@ -134,10 +137,9 @@ plugins/available/zoxide.plugin.bash
 
 # tests
 #
-test/plugins/alias-completion.plugin.bats
+test/completion/aliases.completion.bats
 test/run
 test/test_helper.bash
-test/test_helper_libs.bash
 
 # themes
 #
@@ -155,11 +157,13 @@ themes/bobby-python
 themes/brainy
 themes/brunton
 themes/candy
-themes/command_duration.theme.bash
 themes/easy
 themes/essential
+themes/githelpers.theme.bash
 themes/modern
 themes/norbu
+themes/oh-my-posh
+themes/p4helpers.theme.bash
 themes/pete
 themes/powerline
 themes/pure

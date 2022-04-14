@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2022-02-19 11:01:41 martin>
+# Time-stamp: <2022-04-14 14:02:00 martin>
 
 CLION_HOME=$HOME/.local/opt/jetbrains/clion
 
@@ -30,7 +30,7 @@ user=$(id -un)-$(id -u)
 export CLION_VM_OPTIONS=/tmp/${user}_clion.vmoptions
 
 cat > $CLION_VM_OPTIONS <<EOF
--XX:ReservedCodeCacheSize=256m
+-XX:ReservedCodeCacheSize=512m
 -XX:+UseCodeCacheFlushing
 -XX:-UseLargePages
 -ea

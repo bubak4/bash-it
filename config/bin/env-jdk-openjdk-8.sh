@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2021-11-10 20:35:03 martin>
+# Time-stamp: <2022-04-14 14:02:00 martin>
 
 version=openjdk-8
 JAVA_HOME=$(find /usr/lib/jvm -maxdepth 1 -type d -name "*${version}*" | sort | tail -1)
@@ -11,7 +11,7 @@ PATH=${ANT_HOME}/bin:$PATH
 export ANT_HOME PATH
 
 MAVEN_HOME="/opt/apache/apache-maven-3.8.1"
-MAVEN_OPTS="-Xmx2048m -XX:ReservedCodeCacheSize=128m"
+MAVEN_OPTS="-Xmx2048m -XX:ReservedCodeCacheSize=512m"
 PATH=${MAVEN_HOME}/bin:$PATH
 export MAVEN_HOME MAVEN_OPTS PATH
 

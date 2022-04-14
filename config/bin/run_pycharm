@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2022-02-19 11:02:56 martin>
+# Time-stamp: <2022-04-14 13:59:20 martin>
 
 PYCHARM_HOME=$HOME/.local/opt/jetbrains/pycharm
 
@@ -30,7 +30,7 @@ user=$(id -un)-$(id -u)
 export PYCHARM_VM_OPTIONS=/tmp/${user}_pycharm.vmoptions
 
 cat > $PYCHARM_VM_OPTIONS <<EOF
--XX:ReservedCodeCacheSize=256m
+-XX:ReservedCodeCacheSize=512m
 -XX:+UseCodeCacheFlushing
 -XX:-UseLargePages
 -ea

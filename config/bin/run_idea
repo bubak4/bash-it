@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2022-02-19 11:02:24 martin>
+# Time-stamp: <2022-04-14 13:58:55 martin>
 
 JIDEA_HOME=$HOME/.local/opt/jetbrains/idea-IC
 
@@ -30,7 +30,7 @@ user=$(id -un)-$(id -u)
 export IDEA_VM_OPTIONS=/tmp/${user}_idea.vmoptions
 
 cat > $IDEA_VM_OPTIONS <<EOF
--XX:ReservedCodeCacheSize=256m
+-XX:ReservedCodeCacheSize=512m
 -XX:+UseCodeCacheFlushing
 -XX:-UseLargePages
 -ea

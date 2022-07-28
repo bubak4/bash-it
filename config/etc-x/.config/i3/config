@@ -181,9 +181,9 @@ for_window [instance="VirtualBox Machine" class="VirtualBox Machine"] floating e
 for_window [instance="VirtualBox Manager" class="VirtualBox Manager"] floating enable
 
 bindsym $mod+m exec ~/bin/run_emacs
-bindsym $mod+n exec ~/bin/run_mc
+bindsym $mod+n exec "zenity --text-info --editable --font 'Andika 18' --title 'Sticky note'"
+bindsym $mod+Shift+n exec ~/bin/run_mc
 bindsym $mod+i exec i3lock-fancy -f Andika
-bindsym $mod+Shift+s exec "zenity --text-info --editable --font 'Andika 18' --title 'Sticky note'"
 
 # desktop notifications (code 34 == [, code 35 == ])
 bindcode $mod+34 exec "notify-send 'notification paused' && killall -SIGUSR1 dunst"
@@ -193,6 +193,7 @@ bindcode $mod+35 exec "notify-send 'notification resumed' && killall -SIGUSR2 du
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5%    # increase sound volume
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5%    # decrease sound volume
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle          # mute sound
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-sink-mute 0 toggle       # mute sound
 bindsym XF86MonBrightnessUp exec xbacklight -inc 20                              # increase screen brightness
 bindsym XF86MonBrightnessDown exec xbacklight -dec 20                            # decrease screen brightness
 

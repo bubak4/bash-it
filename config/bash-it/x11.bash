@@ -75,13 +75,15 @@ function x-kb-logitech()
 function x-mouse()
 {
     # xset m acceleration threshold
-    xset m 3 1
-    for device_id in $(xinput --list | fgrep -e "TrackPoint" |
-                           fgrep -e "pointer" |
-                           perl -p -e 's/.*id=(\d+).*/\1/g') ; do
-        if xinput --list-props $device_id | fgrep "libinput Accel Speed" >/dev/null ; then
-            echo "I: setting movement speed for device $(xinput --list --name-only $device_id)"
-            xinput --set-prop $device_id "libinput Accel Speed" -0.5
+    xset m 4 1
+    for device_name in "Elan Touchpad" "Elan TrackPoint" "ThinkPad X1 Presenter Mouse" ; do
+        device_id=$(xinput --list | fgrep -e "$device_name" | fgrep -e "pointer" | perl -p -e 's/.*id=(\d+).*/\1/g')
+        if test -n "$device_id" ; then
+            echo "I: found device $device_name (id = $device_id)"
+            if xinput --list-props $device_id | fgrep "libinput Accel Speed" >/dev/null ; then
+                echo "I: setting movement speed for device $(xinput --list --name-only $device_id)"
+                xinput --set-prop $device_id "libinput Accel Speed" -0.5
+            fi
         fi
     done
 }

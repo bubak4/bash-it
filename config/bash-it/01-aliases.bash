@@ -46,3 +46,7 @@ alias urlencode='python2 -c "import sys, urllib as ul; print(ul.quote_plus(sys.a
 alias urldecode='python2 -c "import sys, urllib as ul; print(ul.unquote_plus(sys.argv[1]))"'
 
 alias pyvenv-create='python3 -m venv .venv && . .venv/bin/activate && pip install wheel'
+
+alias uxplay="~/.local/src/UxPlay/uxplay"
+
+alias crossover="/opt/cxoffice/bin/crossover"

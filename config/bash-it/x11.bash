@@ -76,7 +76,13 @@ function x-mouse()
 {
     # xset m acceleration threshold
     xset m 4 1
-    for device_name in "Elan Touchpad" "Elan TrackPoint" "ThinkPad X1 Presenter Mouse" ; do
+    for device_name in \
+        "Elan Touchpad" \
+        "Elan TrackPoint" \
+        "ThinkPad Compact Bluetooth Keyboard with TrackPoint" \
+        "TrackPoint Keyboard II Mouse" \
+        "ThinkPad X1 Presenter Mouse"
+    do
         device_id=$(xinput --list | fgrep -e "$device_name" | fgrep -e "pointer" | perl -p -e 's/.*id=(\d+).*/\1/g')
         if test -n "$device_id" ; then
             echo "I: found device $device_name (id = $device_id)"

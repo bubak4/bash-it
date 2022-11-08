@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2022-04-14 13:59:20 martin>
+# Time-stamp: <2022-11-08 22:04:32 martin>
 
 PYCHARM_HOME=$HOME/.local/opt/jetbrains/pycharm
 
@@ -45,7 +45,7 @@ cat > $PYCHARM_VM_OPTIONS <<EOF
 EOF
 
 # hack for debug: https://youtrack.jetbrains.com/issue/PY-44384
-export PYDEVD_USE_CYTHON=NO
-export PYDEVD_USE_FRAME_EVAL=NO
+#export PYDEVD_USE_CYTHON=NO
+#export PYDEVD_USE_FRAME_EVAL=NO
 
 $PYCHARM_HOME/bin/pycharm.sh

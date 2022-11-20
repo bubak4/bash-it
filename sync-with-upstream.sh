@@ -8,3 +8,7 @@ git checkout master
 git merge upstream/master
 # push
 git push
+# checkout feature/config
+git checkout feature/config
+# merge master
+git merge master

@@ -343,7 +343,7 @@ function x-display()
         xrandr --output $external \
             --auto \
             --mode $external_mode \
-            --right-of $internal \
+            --above $internal \
             --scale-from $internal_mode
     elif test "$action" = "off" ; then
         # check for disconnected external and fix them

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Time-stamp: <2022-07-28 16:39:01 martin>
+# Time-stamp: <2023-01-31 01:17:42 martin>
 
 # shell environment (does not have to be processed by bash in this script)
 if test -f ~/.bash_profile ; then
     . ~/.bash_profile
-    eval $(cat ~/.bashrc | fgrep -e BASH_IT=)
+    eval "$(cat ~/.bashrc | grep -F -e BASH_IT=)"
 fi
 
 # ensure custom Xresources are loaded
@@ -59,7 +59,7 @@ else
 
         # start new instance of gnome-keyring-daemon
         if which gnome-keyring-daemon >/dev/null ; then
-            eval export $(cat ~/.install-secret | gnome-keyring-daemon --daemonize --unlock)
+            eval export "$(cat ~/.install-secret | gnome-keyring-daemon --daemonize --unlock)"
         fi
         xset -b # disable system beep
         xset +dpms && xset dpms 300

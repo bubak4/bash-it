@@ -49,10 +49,10 @@ exec --no-startup-id $greenclip daemon
 bindsym Control+Mod1+h exec rofi -modi "clipboard:$greenclip print" -show clipboard -width 80 -lines 25 -font "Anonymous Pro 14"
 
 # change focus
-bindsym $mod+j focus left
-bindsym $mod+k focus down
-bindsym $mod+l focus up
-bindsym $mod+semicolon focus right
+# bindsym $mod+j focus left
+# bindsym $mod+k focus down
+# bindsym $mod+l focus up
+# bindsym $mod+semicolon focus right
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
@@ -183,7 +183,7 @@ for_window [instance="VirtualBox Manager" class="VirtualBox Manager"] floating e
 bindsym $mod+m exec ~/bin/run_emacs
 bindsym $mod+n exec "zenity --text-info --editable --font 'Andika 18' --title 'Sticky note'"
 bindsym $mod+Shift+n exec ~/bin/run_mc
-bindsym $mod+i exec i3lock-fancy -f Andika
+bindsym $mod+l exec i3lock-fancy -f Andika
 
 # desktop notifications (code 34 == [, code 35 == ])
 bindcode $mod+34 exec "notify-send 'notification paused' && killall -SIGUSR1 dunst"

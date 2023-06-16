@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2022-11-08 22:04:32 martin>
+# Time-stamp: <2023-06-16 11:37:36 martin>
 
 PYCHARM_HOME=$HOME/.local/opt/jetbrains/pycharm
 
@@ -11,7 +11,7 @@ export PATH
 # java virtual machine of choice
 #
 
-. ~/bin/env-jdk-openjdk-11.sh
+. ~/bin/env-jdk-openjdk-17.sh
 vm="$JAVA_HOME/bin/java"
 echo "I: vm=${vm}"
 

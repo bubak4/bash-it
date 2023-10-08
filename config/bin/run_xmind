@@ -1,7 +1,7 @@
 #!/bin/bash
-# Time-stamp: <2022-07-13 07:42:22 martin>
+# Time-stamp: <2023-10-05 12:56:29 martin>
 
-. ~/bin/env-jdk-openjdk-8.sh
+. ~/bin/env-jdk-sun-1.8.sh
 
 XMIND_HOME=$HOME/.local/opt/xmind/XMind_amd64
 cd $XMIND_HOME

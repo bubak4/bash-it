@@ -38,13 +38,13 @@ Xft.rgba: rgb
 
 ! - - - -
 
-!Emacs*font: DejaVu Sans Mono 11
-!Emacs*font: Source Code Pro 11
-Emacs*font: Anonymous Pro 11
+!Emacs*font: DejaVu Sans Mono 12
+!Emacs*font: Source Code Pro 12
+Emacs*font: Anonymous Pro 12
 
 !XTerm*faceName: Droid Sans Mono
 XTerm*faceName: Anonymous Pro
-XTerm*faceSize: 11
+XTerm*faceSize: 12
 XTerm*locale: true
 XTerm*metaSendsEscape: true
 XTerm*cursorBlink: True
@@ -53,9 +53,12 @@ XTerm*Maximized: true
 
 URxvt*transparent: True
 URxvt*shading: 15
-URxvt*font: xft:Anonymous Pro:antialias=true:size=11
-URxvt*boldFont: xft:Anonymous Pro:antialias=true:size=11:bold
-URxvt*italicFont: xft:Anonymous Pro:antialias=true:size=11:italic
+!URxvt*font: xft:Anonymous Pro:antialias=true:size=11
+!URxvt*boldFont: xft:Anonymous Pro:antialias=true:size=11:bold
+!URxvt*italicFont: xft:Anonymous Pro:antialias=true:size=11:italic
+URxvt*font: xft:Inconsolata:antialias=true:size=13
+URxvt*boldFont: xft:Inconsolata:antialias=true:size=13:bold
+URxvt*italicFont: xft:Inconsolata:antialias=true:size=13:italic
 URxvt*scrollBar: False
 URxvt*cursorBlink: True
 URxvt*bordeLess: True

@@ -225,6 +225,8 @@ function x-display()
 {
     # info | external | duplicate | extend | off
     local action=${1:-"info"}
+    # --above, --below, --right-of, --left-of
+    local extend_placement=${EXTEND_PLACEMENT:-"--above"}
 
     local requested_dpi=${DPI:-$(x-dpi)}
     local requested_mode=${MODE:-""}
@@ -292,6 +294,7 @@ function x-display()
     echo "I: requested_dpi               = $requested_dpi"
     echo "I: requested_mode              = $requested_mode"
     echo "I: action                      = $action"
+    echo "I: extend                      = $extend_placement"
     echo "I: GDK_SCALE                   = $GDK_SCALE"
     echo "I: GDK_DPI_SCALE               = $GDK_DPI_SCALE"
     xrdb -query | fgrep -e "Xft"
@@ -339,11 +342,10 @@ function x-display()
             --dpi $internal_dpi
 
         x-dpi-apply $external # Xft will be set to $external_dpi
-        # --above, --below, --right-of, --left-of
         xrandr --output $external \
             --auto \
             --mode $external_mode \
-            --above $internal \
+            $extend_placement $internal \
             --scale-from $internal_mode
     elif test "$action" = "off" ; then
         # check for disconnected external and fix them
@@ -430,4 +432,13 @@ function x-4k-display-on()
 function x-duplicate()
 {
     x-display duplicate
+}
+
+function x-extend()
+{
+    EXTEND_PLACEMENT="--above"
+    x-display extend
+    if which i3-msg ; then
+        i3-msg "move workspace to output next"
+    fi
 }

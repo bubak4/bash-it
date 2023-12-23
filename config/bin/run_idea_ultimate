@@ -23,17 +23,6 @@ max_jvm_memory=12g
 echo "I: max_jvm_memory=${max_jvm_memory}"
 
 #
-# scaling on hi-res displays -- use sun.java2d.uiScale below
-#
-
-# https://intellij-support.jetbrains.com/hc/en-us/articles/360007994999-HiDPI-configuration
-unset GDK_SCALE
-unset GDK_DPI_SCALE
-
-export GDK_SCALE=0.8
-export GDK_DPI_SCALE=0.8
-
-#
 # executing command
 #
 
@@ -54,7 +43,6 @@ cat > $IDEA_VM_OPTIONS <<EOF
 -Dswing.aatext=true
 -Dawt.useSystemAAFontSettings=lcd
 -Dsun.java2d.uiScale.enabled=true
--Dsun.java2d.uiScale=1.0
 EOF
 
 cat $IDEA_VM_OPTIONS

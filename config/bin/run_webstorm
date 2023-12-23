@@ -19,7 +19,7 @@ echo "I: vm=${vm}"
 # memory
 #
 
-max_jvm_memory=1g
+max_jvm_memory=4g
 echo "I: max_jvm_memory=${max_jvm_memory}"
 
 #
@@ -42,6 +42,7 @@ cat > $WEBSTORM_VM_OPTIONS <<EOF
 -Duser.name=martin.slouf
 -Dswing.aatext=true
 -Dawt.useSystemAAFontSettings=lcd
+-Dsun.java2d.uiScale.enabled=true
 EOF
 
 $WEBSTORM_HOME/bin/webstorm.sh

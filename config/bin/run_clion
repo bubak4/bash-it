@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-06-16 11:37:47 martin>
+# Time-stamp: <2023-12-23 13:16:52 martin>
 
 CLION_HOME=$HOME/.local/opt/jetbrains/clion
 
@@ -19,7 +19,7 @@ echo "I: vm=${vm}"
 # memory
 #
 
-max_jvm_memory=2g
+max_jvm_memory=4g
 echo "I: max_jvm_memory=${max_jvm_memory}"
 
 #
@@ -42,6 +42,7 @@ cat > $CLION_VM_OPTIONS <<EOF
 -Duser.name=martin.slouf
 -Dswing.aatext=true
 -Dawt.useSystemAAFontSettings=lcd
+-Dsun.java2d.uiScale.enabled=true
 EOF
 
 $CLION_HOME/bin/clion.sh

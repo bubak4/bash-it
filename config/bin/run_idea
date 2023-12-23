@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-06-16 11:38:14 martin>
+# Time-stamp: <2023-12-23 13:19:30 martin>
 
 JIDEA_HOME=$HOME/.local/opt/jetbrains/idea-IC
 
@@ -19,7 +19,7 @@ echo "I: vm=${vm}"
 # memory
 #
 
-max_jvm_memory=3g
+max_jvm_memory=8g
 echo "I: max_jvm_memory=${max_jvm_memory}"
 
 #
@@ -42,6 +42,7 @@ cat > $IDEA_VM_OPTIONS <<EOF
 -Duser.name=martin.slouf
 -Dswing.aatext=true
 -Dawt.useSystemAAFontSettings=lcd
+-Dsun.java2d.uiScale.enabled=true
 EOF
 
 $JIDEA_HOME/bin/idea.sh

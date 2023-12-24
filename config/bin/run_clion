@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-12-23 13:16:52 martin>
+# Time-stamp: <2023-12-24 11:28:36 martin>
 
 CLION_HOME=$HOME/.local/opt/jetbrains/clion
 
@@ -42,7 +42,7 @@ cat > $CLION_VM_OPTIONS <<EOF
 -Duser.name=martin.slouf
 -Dswing.aatext=true
 -Dawt.useSystemAAFontSettings=lcd
--Dsun.java2d.uiScale.enabled=true
+-Dsun.java2d.uiScale.enabled=false
 EOF
 
 $CLION_HOME/bin/clion.sh

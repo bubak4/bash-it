@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-12-23 13:14:33 martin>
+# Time-stamp: <2023-12-23 15:16:56 martin>
 
 PYCHARM_HOME=$HOME/.local/opt/jetbrains/pycharm
 
@@ -42,7 +42,7 @@ cat > $PYCHARM_VM_OPTIONS <<EOF
 -Duser.name=martin.slouf
 -Dswing.aatext=true
 -Dawt.useSystemAAFontSettings=lcd
--Dsun.java2d.uiScale.enabled=true
+-Dsun.java2d.uiScale.enabled=false
 EOF
 
 # hack for debug: https://youtrack.jetbrains.com/issue/PY-44384

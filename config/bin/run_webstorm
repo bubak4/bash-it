@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-06-16 11:38:01 martin>
+# Time-stamp: <2023-12-24 11:28:27 martin>
 
 WEBSTORM_HOME=$HOME/.local/opt/jetbrains/WebStorm
 
@@ -42,7 +42,7 @@ cat > $WEBSTORM_VM_OPTIONS <<EOF
 -Duser.name=martin.slouf
 -Dswing.aatext=true
 -Dawt.useSystemAAFontSettings=lcd
--Dsun.java2d.uiScale.enabled=true
+-Dsun.java2d.uiScale.enabled=false
 EOF
 
 $WEBSTORM_HOME/bin/webstorm.sh

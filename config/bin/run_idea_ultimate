@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-06-16 11:37:18 martin>
+# Time-stamp: <2023-12-24 11:27:45 martin>
 
 JIDEA_HOME=$HOME/.local/opt/jetbrains/idea-IU
 
@@ -42,7 +42,7 @@ cat > $IDEA_VM_OPTIONS <<EOF
 -Duser.name=martin.slouf
 -Dswing.aatext=true
 -Dawt.useSystemAAFontSettings=lcd
--Dsun.java2d.uiScale.enabled=true
+-Dsun.java2d.uiScale.enabled=false
 EOF
 
 cat $IDEA_VM_OPTIONS

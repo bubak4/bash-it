@@ -56,9 +56,9 @@ URxvt*shading: 15
 !URxvt*font: xft:Anonymous Pro:antialias=true:size=11
 !URxvt*boldFont: xft:Anonymous Pro:antialias=true:size=11:bold
 !URxvt*italicFont: xft:Anonymous Pro:antialias=true:size=11:italic
-URxvt*font: xft:Inconsolata:antialias=true:size=13
-URxvt*boldFont: xft:Inconsolata:antialias=true:size=13:bold
-URxvt*italicFont: xft:Inconsolata:antialias=true:size=13:italic
+URxvt*font: xft:Inconsolata:antialias=true:size=12
+URxvt*boldFont: xft:Inconsolata:antialias=true:size=12:bold
+URxvt*italicFont: xft:Inconsolata:antialias=true:size=12:italic
 URxvt*scrollBar: False
 URxvt*cursorBlink: True
 URxvt*bordeLess: True

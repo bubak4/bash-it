@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-11-02 23:12:23 martin>
+# Time-stamp: <2023-12-29 02:22:29 martin>
 
 tmux new-session -d -s main
 
@@ -18,7 +18,7 @@ which htop && \
     tmux new-window -n "htop" -t main 'htop'
 
 # x11vnc
-which x11vnc && \
+( [[ -n "$DISPLAY" ]] && which x11vnc ) && \
     tmux new-window -n "x11vnc" -t main 'while true ; do x11vnc -rfbport 5900 ; done'
 
 # bookworm chroot (i386)

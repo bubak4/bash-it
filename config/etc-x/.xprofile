@@ -1,11 +1,48 @@
 #!/usr/bin/env bash
-# Time-stamp: <2023-11-03 22:24:17 martin>
+# Time-stamp: <2024-03-24 13:03:22 martin>
+# This script does not have to be processed by bash though it is declared as such
 
-# shell environment (does not have to be processed by bash in this script)
+#####################
+# shell environment #
+#####################
+
 if test -f ~/.bash_profile ; then
     . ~/.bash_profile
     eval "$(cat ~/.bashrc | grep -F -e BASH_IT=)"
 fi
+
+if test -n "$BASH_IT" ; then
+    x11bash=$(find $BASH_IT/config -name x11.bash)
+fi
+
+###############
+# i3 terminal #
+###############
+
+# setting for i3-sensible-terminal
+if which terminator >/dev/null ; then
+    export TERMINAL=terminator
+elif which urxvtd >/dev/null ; then
+    if ! ps -C urxvtd >/dev/null ; then
+        urxvtd -q -f -o
+    fi
+    export TERMINAL=urxvtc
+else
+    export TERMINAL=xterm
+fi
+
+##############
+# PulseAudio #
+##############
+
+# PulseAudio network module for schroot gamer
+if which pactl ; then
+    pactl load-module module-native-protocol-tcp listen=127.0.0.1
+fi
+
+###########
+# X setup #
+###########
 
 # ensure custom Xresources are loaded
 if test -f ~/.Xresources ; then
@@ -15,77 +52,56 @@ fi
 # allow access to X to anyone from my OS group
 chmod g+r ~/.Xauthority
 # allow access to selected local users
-for i in gamer root basex hazelcast openam ; do
+for i in gamer root ; do
     id $i>/dev/null && xhost +si:localuser:$i
 done
 
-# start rxvt server
-if ! ps -C urxvtd >/dev/null && which urxvtd >/dev/null ; then
-    urxvtd -q -f -o
-    export TERMINAL=urxvtc # setting for i3-sensible-terminal
-fi
-
-# extra Wayland settings -- not used
-#if test -n "$WAYLAND_DISPLAY" ; then
-#    export QT_QPA_PLATFORM=wayland
-#fi
-
-if test -n "$BASH_IT" ; then
-    x11bash=$(find $BASH_IT/config -name x11.bash)
-fi
-
-# gnome does things differently
+# gnome does things differently (either wayland or x11)
 if test "$XDG_SESSION_DESKTOP" = "gnome" -o "$XDG_SESSION_DESKTOP" = "gnome-xorg" ; then
     # I prefer this way to gnome 'autostart' feature
     # Program should start once systray is ready, hence the delay
     sh -c "sleep 10 && flameshot" &
-    if test "$XDG_SESSION_TYPE" = "x11" ; then
-        # .xprofile may not be processed in bash, ensure the following commands are
-        if test -r "$x11bash" ; then
-            x_bash_script=$(mktemp x-profile-bash.XXXX.sh)
-            cat > $x_bash_script <<EOF
+fi
+
+# only for X11
+if test "$XDG_SESSION_TYPE" = "x11" -o "$XDG_SESSION_TYPE" = "tty" ; then
+
+    xset -b # disable system beep
+    xset +dpms && xset dpms 300
+
+    # ensure notebook LVDS* (x230) / eDP* (x390 | t14s) output is marked as primary (if present)
+    for output in $(xrandr | grep '\Wconnected' | awk '{ print $1 }'); do
+        case $output in
+            *LVDS*) xrandr --output $output --primary ;;
+            *eDP*) xrandr --output $output --primary ;;
+            *) ;;
+        esac
+    done
+
+    x_bash_script=$(mktemp x-profile-bash.XXXX.sh)
+    cat > $x_bash_script <<EOF
 #!/usr/bin/env bash
 . $x11bash
 x-kb-thinkpad
 x-mouse
 EOF
-            bash $x_bash_script
-            rm $x_bash_script
-        fi
-    fi
-else
-    # ensure we are not on Wayland
-    if test "$XDG_SESSION_TYPE" = "x11" -o "$XDG_SESSION_TYPE" = "tty" ; then
 
-        # start new instance of gnome-keyring-daemon
+    if test "$XDG_SESSION_DESKTOP" = "gnome" -o "$XDG_SESSION_DESKTOP" = "gnome-xorg" ; then
+        echo "gnome" >/dev/null
+    else
         if which gnome-keyring-daemon >/dev/null ; then
-            eval export "$(cat ~/.install-secret | gnome-keyring-daemon --daemonize --unlock)"
+            dbus-update-activation-environment DISPLAY XAUTHORITY WAYLAND_DISPLAY
+            gnome-keyring-daemon --start --components=secrets
         fi
-        xset -b # disable system beep
-        xset +dpms && xset dpms 300
-
-        # ensure notebook LVDS* (x230) / eDP* (x390) output is marked as primary (if present)
-        for output in $(xrandr | grep '\Wconnected' | awk '{ print $1 }'); do
-            case $output in
-                *LVDS*) xrandr --output $output --primary ;;
-                *eDP*) xrandr --output $output --primary ;;
-                *) ;;
-            esac
-        done
-
-        # .xprofile may not be processed in bash, ensure the following commands are
-        if test -r "$x11bash" ; then
-            x_bash_script=$(mktemp x-profile-bash.XXXX.sh)
-            cat > $x_bash_script <<EOF
-#!/usr/bin/env bash
-. $x11bash
-x-kb-thinkpad
-x-mouse
+        cat >> $x_bash_script <<EOF
 x-touchpad-off
 x-wallpaper
 EOF
-            bash $x_bash_script
-            rm $x_bash_script
-        fi
+    fi
+
+    # .xprofile may not be processed in bash, ensure the following commands are
+    if test -r "$x11bash" ; then
+        bash $x_bash_script
+        rm $x_bash_script
     fi
 fi

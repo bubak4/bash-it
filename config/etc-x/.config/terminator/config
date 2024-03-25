@@ -1,0 +1,33 @@
+[global_config]
+  borderless = True
+  extra_styling = False
+[keybindings]
+[profiles]
+  [[default]]
+  [[martin]]
+    background_darkness = 0.85
+    background_type = transparent
+    font = Inconsolata Medium 12
+    foreground_color = "#deddda"
+    show_titlebar = False
+    scrollbar_position = hidden
+    scrollback_lines = 5000
+    use_system_font = False
+    title_transmit_fg_color = "#ff7800"
+    title_transmit_bg_color = "#9a9996"
+    title_receive_fg_color = "#ff7800"
+    title_receive_bg_color = "#9a9996"
+    title_inactive_fg_color = "#ffbe6f"
+    title_inactive_bg_color = "#c0bfbc"
+    title_use_system_font = False
+    title_font = Andika 9
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+      profile = martin
+[plugins]

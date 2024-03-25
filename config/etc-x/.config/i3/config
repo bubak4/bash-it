@@ -239,8 +239,8 @@ bar {
 }
 
 hide_edge_borders smart
-default_border normal 0
-default_floating_border normal 0
+default_border pixel 0
+default_floating_border pixel 0
 smart_gaps on
 gaps inner 4px
 # default|stacking|tabbed

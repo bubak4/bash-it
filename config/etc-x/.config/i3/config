@@ -27,7 +27,6 @@ set $greenclip ~/.local/opt/greenclip
 exec --no-startup-id $greenclip daemon
 bindsym Control+Mod1+h exec rofi -modi "clipboard:$greenclip print" -show clipboard -width 80 -lines 25 -font "Anonymous Pro 18"
 
-
 ############
 # keybings #
 ############
@@ -137,18 +136,6 @@ mode "resize" {
         bindsym Escape mode "default"
 }
 
-bindsym $mod+r mode "resize"
-
-# enable floating for specific windows (use `xprop` to obtain required window attributes)
-#for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+" title="^Welcome to [[:print:]]+"] floating enable
-for_window [instance="blueman-manager" class="Blueman-manager"] floating enable
-for_window [instance="pavucontrol" class="Pavucontrol"] floating enable
-for_window [instance="nm-connection-editor" class="Nm-connection-editor"] floating enable
-for_window [instance="gnome-calculator" class="gnome-calculator"] floating enable
-for_window [instance="virt-manager" class="Virt-manager"] floating enable
-for_window [instance="VirtualBox Machine" class="VirtualBox Machine"] floating enable
-for_window [instance="VirtualBox Manager" class="VirtualBox Manager"] floating enable
-
 bindsym $mod+m exec ~/bin/run_emacs
 bindsym $mod+n exec "zenity --text-info --editable --font 'Andika 18' --title 'Sticky note'"
 bindsym $mod+Shift+n exec ~/bin/run_mc
@@ -178,11 +165,13 @@ bindsym $mod+minus move scratchpad
 # show most recently 'scratchpadded window'
 bindsym $mod+Shift+minus scratchpad show
 
+bindsym $mod+r mode "resize"
 # pass-through mode for nested i3 sessions, thanks to: https://faq.i3wm.org/question/1679/toggle-i3s-listening-behavior/post-id-1681%3C/p%3E
 mode "pass-through" {
     bindsym $mod+BackSpace mode "default"
 }
 bindsym $mod+BackSpace mode "pass-through"
+
 
 ####################
 # startup programs #
@@ -251,8 +240,22 @@ bar {
 
 hide_edge_borders smart
 default_border normal 1
+default_floating_border normal 1
 smart_gaps on
 gaps inner 4px
 # default|stacking|tabbed
 workspace_layout tabbed
+
 for_window [all] title_window_icon on
+# customize style for various applications / windows
+# use `xprop` to obtain required window attributes
+#for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+" title="^Welcome to [[:print:]]+"] floating enable
+for_window [instance="blueman-manager" class="Blueman-manager"] floating enable
+for_window [instance="pavucontrol" class="Pavucontrol"] floating enable
+for_window [instance="nm-connection-editor" class="Nm-connection-editor"] floating enable
+for_window [instance="gnome-calculator" class="gnome-calculator"] floating enable
+for_window [instance="virt-manager" class="Virt-manager"] floating enable
+for_window [instance="VirtualBox Machine" class="VirtualBox Machine"] floating enable
+for_window [instance="VirtualBox Manager" class="VirtualBox Manager"] floating enable
+for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] title_window_icon off
+for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] border pixel 0

@@ -247,8 +247,10 @@ gaps inner 4px
 workspace_layout tabbed
 
 for_window [all] title_window_icon off
+
 # customize style for various applications / windows
 # use `xprop` to obtain required window attributes
+
 #for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+" title="^Welcome to [[:print:]]+"] floating enable
 for_window [instance="blueman-manager" class="Blueman-manager"] floating enable
 for_window [instance="pavucontrol" class="Pavucontrol"] floating enable
@@ -257,5 +259,6 @@ for_window [instance="gnome-calculator" class="gnome-calculator"] floating enabl
 for_window [instance="virt-manager" class="Virt-manager"] floating enable
 for_window [instance="VirtualBox Machine" class="VirtualBox Machine"] floating enable
 for_window [instance="VirtualBox Manager" class="VirtualBox Manager"] floating enable
+# make sure for vncviewer we have no borders regardless any other settings
 for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] title_window_icon off
 for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] border pixel 0

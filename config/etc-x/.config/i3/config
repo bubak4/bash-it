@@ -239,8 +239,9 @@ bar {
 }
 
 hide_edge_borders smart
-default_border pixel 0
-default_floating_border pixel 0
+#default_border pixel 0
+default_border normal 1
+default_floating_border normal 1
 smart_gaps on
 gaps inner 4px
 # default|stacking|tabbed
@@ -259,6 +260,11 @@ for_window [instance="gnome-calculator" class="gnome-calculator"] floating enabl
 for_window [instance="virt-manager" class="Virt-manager"] floating enable
 for_window [instance="VirtualBox Machine" class="VirtualBox Machine"] floating enable
 for_window [instance="VirtualBox Manager" class="VirtualBox Manager"] floating enable
+for_window [instance="evolution-alarm-notify" class="Evolution-alarm-notify"] floating enable
 # make sure for vncviewer we have no borders regardless any other settings
 for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] title_window_icon off
 for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] border pixel 0
+for_window [instance="emacs" class="Emacs"] title_window_icon off
+for_window [instance="emacs" class="Emacs"] border pixel 0
+for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] title_window_icon off
+for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] border pixel 0

@@ -9,8 +9,12 @@
 [ -r $HOME/.bash_profile ] && . $HOME/.bash_profile
 
 [ -x /usr/bin/dbus-launch ] && eval $(dbus-launch --sh-syntax --exit-with-session)
-[ -x /usr/bin/gnome-keyring-daemon ] && eval $(cat ~/.install-secret | gnome-keyring-daemon --daemonize --unlock)
-[ -x /usr/bin/urxvtd ] && (urxvtd -q -f -o ; export TERMINAL=urxvtc)
+if which gnome-keyring-daemon >/dev/null ; then
+    dbus-update-activation-environment DISPLAY XAUTHORITY WAYLAND_DISPLAY
+    gnome-keyring-daemon --start --components=secrets
+fi
+#[ -x /usr/bin/gnome-keyring-daemon ] && eval $(cat ~/.install-secret | gnome-keyring-daemon --daemonize --unlock)
+#[ -x /usr/bin/urxvtd ] && (urxvtd -q -f -o ; export TERMINAL=urxvtc)
 
 xsetroot -solid grey
 x-terminal-emulator &

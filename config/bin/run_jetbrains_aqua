@@ -1,7 +1,7 @@
 #!/bin/bash
-# Time-stamp: <2024-04-05 20:50:24 martin>
+# Time-stamp: <2024-04-05 20:51:45 martin>
 
-JIDEA_HOME=$HOME/.local/opt/jetbrains/idea-IU
+AQUA_HOME=$HOME/.local/opt/jetbrains/aqua
 
 # we do not want anything else (even Java) in the PATH
 PATH=/usr/local/bin:/usr/bin:/bin
@@ -19,7 +19,7 @@ echo "I: vm=${vm}"
 # memory
 #
 
-max_jvm_memory=12g
+max_jvm_memory=2g
 echo "I: max_jvm_memory=${max_jvm_memory}"
 
 #
@@ -27,9 +27,9 @@ echo "I: max_jvm_memory=${max_jvm_memory}"
 #
 
 user=$(id -un)-$(id -u)
-export IDEA_VM_OPTIONS=/tmp/${user}_idea_ultimate.vmoptions
+export AQUA_VM_OPTIONS=/tmp/${user}_aqua.vmoptions
 
-cat > $IDEA_VM_OPTIONS <<EOF
+cat > $AQUA_VM_OPTIONS <<EOF
 -XX:ReservedCodeCacheSize=512m
 -XX:+UseCodeCacheFlushing
 -XX:-UseLargePages
@@ -45,6 +45,8 @@ cat > $IDEA_VM_OPTIONS <<EOF
 -Dsun.java2d.uiScale.enabled=false
 EOF
 
-cat $IDEA_VM_OPTIONS
+# hack for debug: https://youtrack.jetbrains.com/issue/PY-44384
+#export PYDEVD_USE_CYTHON=NO
+#export PYDEVD_USE_FRAME_EVAL=NO
 
-$JIDEA_HOME/bin/idea.sh
+$AQUA_HOME/bin/aqua.sh

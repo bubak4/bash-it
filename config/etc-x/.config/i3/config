@@ -268,3 +268,4 @@ for_window [instance="emacs" class="Emacs"] title_window_icon off
 for_window [instance="emacs" class="Emacs"] border pixel 0
 for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] title_window_icon off
 for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] border pixel 0
+for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+" window_type="dialog"] border pixel 4

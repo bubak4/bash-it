@@ -266,6 +266,8 @@ for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] title_window_ico
 for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] border pixel 0
 for_window [instance="emacs" class="Emacs"] title_window_icon off
 for_window [instance="emacs" class="Emacs"] border pixel 0
+for_window [instance="Navigator" class="firefox"] title_window_icon off
+for_window [instance="Navigator" class="firefox"] border pixel 0
 for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] title_window_icon off
 for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] border pixel 0
 for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+" window_type="dialog"] border pixel 2

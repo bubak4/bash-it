@@ -172,13 +172,12 @@ mode "pass-through" {
 }
 bindsym $mod+BackSpace mode "pass-through"
 
-
 ####################
 # startup programs #
 ####################
 
 exec --no-startup-id xset dpms 300
-exec --no-startup-id xautolock -time 15 -locker "i3lock-fancy -f Andika"
+# exec --no-startup-id xautolock -time 15 -locker "i3lock-fancy -f Andika"
 exec --no-startup-id picom
 
 exec --no-startup-id nm-applet

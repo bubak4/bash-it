@@ -1,10 +1,21 @@
+export GITLAB_URI=https://gitlab.livesystems.cz
+export GITLAB_TOKEN=glpat-BhjKp9EDS-HvYdsZbZ1x
+
 function ls-git-repo-setup()
 {
     git config user.name "martin.slouf"
     git config user.email "martin.slouf@livesystems.cz"
     git config pull.rebase false
 
-    git config --list
+    # git config --list --show-scope
+}
+
+function ls-git-dir-setup()
+{
+    for i in $(find -name .git) ; do
+         target=$(dirname $(realpath $i))
+        cd $target && ls-git-repo-setup && cd - > /dev/null
+    done
 }
 
 function ls-git-add-remote()
@@ -25,6 +36,20 @@ function ls-git-add-remote()
         git push $remote_name --all
         git push $remote_name --tags
     fi
+}
+
+function ls-git-group-clone()
+{
+    local group_name=$1
+    local repo_url=${2:-"$GITLAB_URI"}
+
+    if test -z "$repo_name"; then
+        echo "Usage: ls-git-repo-clone <repo_name> [repo_url]"
+        return 1
+    fi
+
+    glab repo clone -g <group> -a=false -p --paginate
+    git clone $repo_url/$repo_name.git
 }
 
 function ls-ssh-keygen()

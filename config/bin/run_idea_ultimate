@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2024-08-08 14:30:42 martin>
+# Time-stamp: <2024-08-16 11:28:49 martin>
 
 JIDEA_HOME=$HOME/.local/opt/jetbrains/idea-IU
 
@@ -47,4 +47,4 @@ EOF
 
 cat $IDEA_VM_OPTIONS
 
-$JIDEA_HOME/bin/idea
+$JIDEA_HOME/bin/idea "$@"

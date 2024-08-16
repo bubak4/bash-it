@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2024-04-05 20:50:45 martin>
+# Time-stamp: <2024-08-16 11:28:40 martin>
 
 PYCHARM_HOME=$HOME/.local/opt/jetbrains/pycharm
 
@@ -49,4 +49,4 @@ EOF
 #export PYDEVD_USE_CYTHON=NO
 #export PYDEVD_USE_FRAME_EVAL=NO
 
-$PYCHARM_HOME/bin/pycharm.sh
+$PYCHARM_HOME/bin/pycharm "$@"

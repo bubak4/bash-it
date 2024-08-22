@@ -13,7 +13,7 @@ function ls-git-repo-setup()
 function ls-git-dir-setup()
 {
     for i in $(find -name .git) ; do
-         target=$(dirname $(realpath $i))
+        target=$(dirname $(realpath $i))
         cd $target && ls-git-repo-setup && cd - > /dev/null
     done
 }

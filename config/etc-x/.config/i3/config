@@ -136,7 +136,7 @@ mode "resize" {
         bindsym Escape mode "default"
 }
 
-bindsym $mod+m exec ~/bin/run_emacs
+bindsym $mod+m exec "emacsclient --create-frame --frame-parameters='((fullscreen . maximized))'"
 bindsym $mod+n exec "zenity --text-info --editable --font 'Andika 18' --title 'Sticky note'"
 bindsym $mod+Shift+n exec ~/bin/run_mc
 bindsym $mod+l exec i3lock-fancy -f Andika

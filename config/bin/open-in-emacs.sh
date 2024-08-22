@@ -5,9 +5,18 @@ filename=$1
 line_number=$2
 column_number=$3
 
-emacs=~/.local/opt/emacs-latest/bin/emacsclient
-if [ ! -x $emacs ]; then
-    emacs=$(which emacs)
+emacs_binaries="~/.local/opt/emacs-latest/bin/emacsclient $(which emacsclient) $(which emacs)"
+emacs=
+for i in $emacs_binaries ; do
+  if [ -x $emacs ]; then
+    emacs=$i
+    break
+  fi
+done
+
+if [ -z "$emacs" ]; then
+    echo "No emacs found"
+    exit 1
 fi
 
 echo "Working directory: $(pwd)"

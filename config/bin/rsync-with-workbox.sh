@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2024-03-21 02:31:07 martin>
+# Time-stamp: <2024-08-25 10:37:01 martin>
 
 target_hostname=workbox.lan
 
@@ -37,6 +37,7 @@ do_rsync() {
 }
 
 do_rsync ~/.bash-it/sync-with-upstream.sh
+do_rsync ~/.bash-it/config/accounts
 do_rsync ~/.ssh
 # do_rsync ~/.gnupg
 do_rsync ~/.doom.d "*.backup"

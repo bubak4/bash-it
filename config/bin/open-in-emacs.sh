@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2024-07-02 09:31:18 martin>
+# Time-stamp: <2024-08-27 21:06:00 martin>
 
 filename=$1
 line_number=$2
@@ -8,7 +8,7 @@ column_number=$3
 emacs_binaries="~/.local/opt/emacs-latest/bin/emacsclient $(which emacsclient) $(which emacs)"
 emacs=
 for i in $emacs_binaries ; do
-  if [ -x $emacs ]; then
+  if [ -x $i ]; then
     emacs=$i
     break
   fi

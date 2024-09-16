@@ -8,6 +8,9 @@ function ls-git-repo-setup()
     git config pull.rebase false
 
     # git config --list --show-scope
+    repo_url=$(git remote -v | head -1 | awk '{print $2}')
+    repo_email=$(git config --get user.email)
+    echo -e "repo: $repo_url\t$repo_email"
 }
 
 function ls-git-dir-setup()
@@ -38,18 +41,28 @@ function ls-git-add-remote()
     fi
 }
 
-function ls-git-group-clone()
+function ls-git-repo-clone()
 {
-    local group_name=$1
-    local repo_url=${2:-"$GITLAB_URI"}
+    local repo_name=$1
 
     if test -z "$repo_name"; then
-        echo "Usage: ls-git-repo-clone <repo_name> [repo_url]"
+        echo "Usage: ls-git-repo-clone <repo_name>"
         return 1
     fi
 
-    glab repo clone -g <group> -a=false -p --paginate
-    git clone $repo_url/$repo_name.git
+    glab repo clone ${repo_name} -a=false -p --paginate
+}
+
+function ls-git-group-clone()
+{
+    local group_name=$1
+
+    if test -z "$group_name"; then
+        echo "Usage: ls-git-group-clone <group_name>"
+        return 1
+    fi
+
+    glab repo clone -g ${group_name} -a=false -p --paginate
 }
 
 function ls-ssh-keygen()

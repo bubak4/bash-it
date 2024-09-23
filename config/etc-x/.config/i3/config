@@ -137,7 +137,7 @@ mode "resize" {
 }
 
 bindsym $mod+m exec "emacsclient --create-frame --frame-parameters='((fullscreen . maximized))'"
-bindsym $mod+n exec "zenity --text-info --editable --font 'Andika 18' --title 'Sticky note'"
+bindsym $mod+n exec "zenity --text-info --editable --font 'Andika 11' --title 'Sticky note'"
 bindsym $mod+Shift+n exec ~/bin/run_mc
 bindsym $mod+l exec i3lock-fancy -f Andika
 
@@ -263,6 +263,9 @@ for_window [instance="evolution-alarm-notify" class="Evolution-alarm-notify"] fl
 # make sure for vncviewer we have no borders regardless any other settings
 for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] title_window_icon off
 for_window [instance="TigerVNC Viewer" class="TigerVNC Viewer"] border pixel 0
+for_window [instance="spicy" class="Spicy"] floating enable
+for_window [instance="spicy" class="Spicy"] title_window_icon on
+for_window [instance="spicy" class="Spicy"] border pixel 0
 for_window [instance="emacs" class="Emacs"] title_window_icon off
 for_window [instance="emacs" class="Emacs"] border pixel 0
 for_window [instance="Navigator" class="firefox"] title_window_icon off
@@ -270,3 +273,4 @@ for_window [instance="Navigator" class="firefox"] border pixel 0
 for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] title_window_icon off
 for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] border pixel 0
 for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+" window_type="dialog"] border pixel 2
+for_window [instance="terminator" class="Terminator"] border pixel 2

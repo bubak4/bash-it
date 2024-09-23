@@ -1,4 +1,5 @@
 # setting the EDITOR variable is rocket science :-)
+# if modification are made here, please see `open-in-emacs.sh` script too
 
 if test -x ~/.local/opt/emacs-latest/bin/emacs ; then
     PATH=~/.local/opt/emacs-latest/bin:$PATH
@@ -37,9 +38,26 @@ function emacs-run()
         emacs_cmd="emacsclient --tty --alternate-editor=$ALTERNATE_EDITOR"
     fi
     $emacs_cmd "$@"
- }
+}
 
 if [[ "$EDITOR" == *emacs ]] ; then
-    EDITOR=emacs-run
     alias ec="emacsclient --create-frame --frame-parameters='((fullscreen . maximized))' --alternate-editor=$ALTERNATE_EDITOR"
+    EDITOR=~/bin/emacs.sh
+    if test ! -x $EDITOR ; then
+        cat > $EDITOR <<'EOF'
+#!/bin/bash
+# copied from bash-it `editor.bash` setup script
+function emacs-run()
+{
+    emacs_cmd="emacsclient --create-frame --alternate-editor=$ALTERNATE_EDITOR"
+    if test -n "$MC_SID" ; then
+        emacs_cmd="emacsclient --tty --alternate-editor=$ALTERNATE_EDITOR"
+    fi
+    $emacs_cmd "$@"
+}
+
+emacs-run "$@"
+EOF
+        chmod +x $EDITOR
+    fi
 fi

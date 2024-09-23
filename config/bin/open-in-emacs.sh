@@ -1,18 +1,19 @@
 #!/bin/bash
-# Time-stamp: <2024-08-27 21:06:00 martin>
+# Time-stamp: <2024-09-20 21:38:27 martin>
+# Customized script for opening file/directory in GNU Emacs from IntelliJ IDEA
+# but can be used from any other IDE or terminal.
+#
+# When opening directory in case it is a git repo, it will launch to magit.
 
 filename=$1
 line_number=$2
 column_number=$3
 
-emacs_binaries="~/.local/opt/emacs-latest/bin/emacsclient $(which emacsclient) $(which emacs)"
-emacs=
-for i in $emacs_binaries ; do
-  if [ -x $i ]; then
-    emacs=$i
-    break
-  fi
-done
+if test -x ~/.local/opt/emacs-latest/bin/emacs ; then
+    PATH=~/.local/opt/emacs-latest/bin:$PATH
+fi
+
+emacs=$(which emacsclient emacs | head -1)
 
 if [ -z "$emacs" ]; then
     echo "No emacs found"

@@ -1,0 +1,113 @@
+#!/bin/bash
+# Time-stamp: <2024-09-21 12:08:11 martin>
+# gitw -- git wrapper for multiple repositories
+
+# SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+# cd $SCRIPTPATH || exit 1
+
+default_branches="master release dev"
+
+function usage() {
+  echo "Usage: $(basename $0) [cmd-merge|cmd-push|<git-command>]"
+  exit 1
+}
+
+function comment_box() {
+  local text="$1"
+  local length=${#text}
+  local border=$(printf '+%*s+\n' "$((length + 2))" '' | tr ' ' '-')
+
+  echo "$border"
+  echo "| $text |"
+  echo "$border"
+}
+
+function find_config() {
+  local cwd=$(pwd)
+  local cfg=".gitwrapper"
+
+  # Loop until we find .git-mine or reach the home directory
+  while test "$cwd" != "/" ; do
+    if test -f "$cwd/$cfg" ; then
+      echo $cwd/$cfg
+      break
+    fi
+    cwd=$(dirname "$cwd")
+  done
+}
+
+# $1 .. cfg
+function find_repos() {
+  local cfg=$1
+
+  if test -z "$cfg" ; then
+    echo "unable to find config"
+    exit 1
+  fi
+
+  for i in $(cat $cfg) ; do
+    repo=$(realpath $(dirname $cfg)/$i)
+    if test -d $repo -a -d $repo/.git ; then
+      echo $repo
+    fi
+  done
+}
+
+# does not work very well (symlinks, terraform module referencing .git tags etc.)
+function find_repos_fallback() {
+  find $(pwd) -name .git -exec dirname {} \; 2>/dev/null
+}
+
+# "$@" .. command pass to git over repos
+# uses global REPOS variable
+function run_command() {
+  comment_box "Running: git $*"
+  for repo in $REPOS ; do
+    cd $repo
+    comment_box $(basename $repo)
+    git "$@"
+  done
+  comment_box "Done: git $*"
+}
+
+function create_branches() {
+  for i in $default_branches ; do
+    $0 checkout master
+    $0 checkout -b develop master
+    $0 push -u origin develop
+  done
+}
+
+function merge_all() {
+  $0 checkout master
+  $0 merge release
+  $0 merge dev
+
+  $0 checkout release
+  $0 merge master
+  $0 merge dev
+
+  $0 checkout dev
+  $0 merge master
+  $0 merge release
+}
+
+function push_all() {
+  for i in $default_branches ; do
+    $0 checkout $i
+    $0 push origin
+  done
+}
+
+cfg=$(find_config)
+REPOS=$(find_repos $cfg)
+
+if test "$1" = "cmd-merge" ; then
+  merge_all
+elif test "$1" = "cmd-push" ; then
+  push_all
+elif test -z "$1" ; then
+  usage
+else
+  run_command "$@"
+fi

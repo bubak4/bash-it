@@ -313,9 +313,8 @@ function x-display()
         if test $old_external_dpi -ne $new_external_dpi ; then
             echo "W: recalculated external dpi ($old_external_dpi => $new_external_dpi)"
             external_dpi=$new_external_dpi
-            x-dpi-apply $external $external_dpi
             # reset mode and dpi to correct values
-            xrandr --output $external --auto --mode $mode_to_apply
+            xrandr --output $external --auto --mode $mode_to_apply --dpi $external_dpi
         fi
         # scaling if any
         if test $external_dpi -ge 144 ; then
@@ -332,8 +331,11 @@ function x-display()
         xrandr --output $internal --primary
         xrandr --output $internal --auto --mode $internal_mode --dpi $internal_dpi
         # external
-        x-dpi-apply $external $external_dpi # Xft will be set to $external_dpi
-        xrandr --output $external --mode $external_mode --scale-from $internal_mode --same-as $internal
+        xrandr --output $external \
+            --mode $external_mode \
+            --scale-from $internal_mode \
+            --same-as $internal \
+            --dpi $external_dpi
     elif test "$action" = "extend" ; then
         xrandr --output $internal \
             --auto \
@@ -341,12 +343,12 @@ function x-display()
             --mode $internal_mode \
             --dpi $internal_dpi
 
-        x-dpi-apply $external # Xft will be set to $external_dpi
         xrandr --output $external \
             --auto \
             --mode $external_mode \
             $extend_placement $internal \
-            --scale-from $internal_mode
+            --scale-from $internal_mode \
+            --dpi $external_dpi
     elif test "$action" = "off" ; then
         # check for disconnected external and fix them
         local disconnected_externals=$(cat $tmp | fgrep -e " disconnected " | fgrep -v "$internal" | cut -f 1 -d " ")

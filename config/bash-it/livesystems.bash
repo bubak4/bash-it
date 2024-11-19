@@ -63,6 +63,9 @@ function ls-git-group-clone()
     fi
 
     glab repo clone -g ${group_name} -a=false -p --paginate
+
+    # repo setup
+    cd ${group_name} && ls-git-dir-setup
 }
 
 function ls-ssh-keygen()

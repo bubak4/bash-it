@@ -396,10 +396,10 @@ function x-external-display-off()
     # unset MODE
     # unset GDK_SCALE
     # unset GDK_DPI_SCALE
-    # export DPI=120 # == 96 * 1.25 => 125% => valid for x390 FHD screen resolution
     local_dpi=$(cat ~/.Xresources | grep -F -e Xft.dpi | awk '{print $2}')
     if test -z "$local_dpi" ; then
-        local_dpi=160 # valid for t14s 2K screen resolution
+        #local_dpi=120 # == 96 * 1.25 => 125% => valid for x390 FHD screen resolution
+        local_dpi=160 # == 96 * 1.67 => 166% => valid for t14s 2K screen resolution
     fi
     export DPI=$local_dpi
     x-display off

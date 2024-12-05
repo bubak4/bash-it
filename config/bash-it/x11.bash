@@ -171,6 +171,13 @@ function x-output()
     echo $output
 }
 
+function x-dpi-default()
+{
+    local xrdb_dpi=$(cat ~/.Xresources | grep -v -e "^[#!].*" | grep -F -e Xft.dpi | awk '{print $2}')
+    xrdb_dpi=${xrdb_dpi:-"96"}
+    echo $xrdb_dpi
+}
+
 # Computes DPI for specified output -- valid results can be computed
 # only for connected and active outputs.
 # Prints the result to stdout.
@@ -178,9 +185,8 @@ function x-output()
 function x-dpi()
 {
     local output=$(x-output "$1")
-    local xrdb_dpi=$(cat ~/.Xresources | grep -v -e "^[#!].*" | grep -F -e Xft.dpi | awk '{print $2}')
-    xrdb_dpi=${xrdb_dpi:-"96"}
-    local dpi=${DPI:-"$xrdb_dpi"}
+    local dpi=$(x-dpi-default)
+    local dpi=${DPI:-"$dpi"}
 
     # save xrandr output as tmp data
     local tmp=$(mktemp $TMPDIR/x-dpi.XXXX)
@@ -220,7 +226,9 @@ function x-dpi()
 # Usage: x-dpi-apply eDP1 96
 function x-dpi-apply()
 {
-    local dpi=${2:-$(x-dpi $1)}
+    local output=$(x-output "$1")
+    local dpi=$(x-dpi $output)
+    dpi=${2:-"$dpi"}
     echo "I: dpi == $dpi"
     echo "Xft.dpi: $dpi" | xrdb -merge
     xrandr --dpi $dpi
@@ -405,12 +413,12 @@ function x-external-display-off()
     # unset MODE
     # unset GDK_SCALE
     # unset GDK_DPI_SCALE
-    local_dpi=$(cat ~/.Xresources | grep -F -e Xft.dpi | awk '{print $2}')
+    local dpi_default=$(x-dpi-default)
     if test -z "$local_dpi" ; then
         #local_dpi=120 # == 96 * 1.25 => 125% => valid for x390 FHD screen resolution
         local_dpi=160 # == 96 * 1.67 => 166% => valid for t14s 2K screen resolution
     fi
-    export DPI=$local_dpi
+    export DPI=$dpi_default
     x-display off
 }
 

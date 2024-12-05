@@ -42,8 +42,8 @@ alias update-desktop-database-local="update-desktop-database ~/.local/share/appl
 alias android-mount="jmtpfs ~/Android && ls -la ~/Android"
 alias android-umount="fusermount -u ~/Android && ls -la ~/Android"
 
-alias urlencode='python2 -c "import sys, urllib as ul; print(ul.quote_plus(sys.argv[1]))"'
-alias urldecode='python2 -c "import sys, urllib as ul; print(ul.unquote_plus(sys.argv[1]))"'
+alias urlencode='python3 -c "import sys, urllib.parse; print(urllib.parse.quote(sys.stdin.read()))"'
+alias urldecode='python3 -c "import sys, urllib.parse; print(urllib.parse.unquote(sys.stdin.read()))"'
 
 alias pyvenv-create='python3 -m venv .venv && . .venv/bin/activate && pip install wheel'
 

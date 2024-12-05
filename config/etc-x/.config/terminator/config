@@ -7,7 +7,7 @@
   [[martin]]
     background_darkness = 0.85
     background_type = transparent
-    font = Inconsolata Medium 12
+    font = Anonymous Pro 12
     foreground_color = "#deddda"
     show_titlebar = False
     scrollbar_position = hidden

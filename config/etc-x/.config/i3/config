@@ -238,15 +238,18 @@ bar {
 }
 
 hide_edge_borders smart
-#default_border pixel 0
-default_border normal 1
-default_floating_border normal 1
+default_border pixel 0
+#default_border normal 1
+#default_floating_border normal 1
 smart_gaps on
 gaps inner 4px
 # default|stacking|tabbed
 workspace_layout tabbed
 
 for_window [all] title_window_icon off
+# border for all floating windows
+for_window [floating] border pixel 2
+for_window [window_type=dialog] border pixel 2
 
 # customize style for various applications / windows
 # use `xprop` to obtain required window attributes
@@ -271,6 +274,4 @@ for_window [instance="emacs" class="Emacs"] border pixel 0
 for_window [instance="Navigator" class="firefox"] title_window_icon off
 for_window [instance="Navigator" class="firefox"] border pixel 0
 for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] title_window_icon off
-for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] border pixel 0
-for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+" window_type="dialog"] border pixel 2
-for_window [instance="terminator" class="Terminator"] border pixel 2
+#for_window [instance="^jetbrains-[[:print:]]+" class="^jetbrains-[[:print:]]+"] border pixel 2

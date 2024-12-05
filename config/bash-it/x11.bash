@@ -178,7 +178,9 @@ function x-output()
 function x-dpi()
 {
     local output=$(x-output "$1")
-    local dpi=${DPI:-"96"}
+    local xrdb_dpi=$(cat ~/.Xresources | grep -v -e "^[#!].*" | grep -F -e Xft.dpi | awk '{print $2}')
+    xrdb_dpi=${xrdb_dpi:-"96"}
+    local dpi=${DPI:-"$xrdb_dpi"}
 
     # save xrandr output as tmp data
     local tmp=$(mktemp $TMPDIR/x-dpi.XXXX)
@@ -189,6 +191,11 @@ function x-dpi()
         if cat $tmp | egrep -e "^$output connected " | fgrep -e "mm x ">/dev/null 2>&1 ; then
             # output connected and resolution + size (in mm) is known
             $(cat $tmp | egrep -e "^$output connected " | perl -pe 's/.* (\d+)x(\d+)\+.* (\d+)mm x (\d+)mm/export x_px=\1 x_mm=\3 y_px=\2 y_mm=\4/g')
+            if test "$x_mm" = "0" -o "$y_mm" = "0" ; then
+                # invalid dimensions
+                x_mm=$(perl -e "print(int(($x_px / $dpi) * 25.4))")
+                y_mm=$(perl -e "print(int(($y_px / $dpi) * 25.4))")
+            fi
             if test -n "$x_px" -a -n "$x_mm" -a -n "$y_px" -a -n "$y_mm" ; then
                 # all the variables are extracted
                 local x_dpi=$(perl -e "print(int($x_px / ($x_mm / 25.4)))")

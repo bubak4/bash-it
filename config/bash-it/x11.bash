@@ -173,20 +173,23 @@ function x-output()
 
 function x-dpi-default()
 {
-    local xrdb_dpi=$(cat ~/.Xresources | grep -v -e "^[#!].*" | grep -F -e Xft.dpi | awk '{print $2}')
-    xrdb_dpi=${xrdb_dpi:-"96"}
-    echo $xrdb_dpi
+    local dpi=$(cat ~/.Xresources | grep -v -e "^[#!].*" | grep -F -e Xft.dpi | awk '{print $2}')
+    dpi=${DPI:-"$dpi"}
+    dpi=${dpi:-"96"}
+    echo $dpi
 }
 
-# Computes DPI for specified output -- valid results can be computed
+# Calculate DPI for specified output
 # only for connected and active outputs.
 # Prints the result to stdout.
-# Usage: dpi=$(x-dpi eDP1)
-function x-dpi()
+# Usage: dpi=$(x-dpi-calc eDP1)
+function x-dpi-calc()
 {
     local output=$(x-output "$1")
     local dpi=$(x-dpi-default)
-    local dpi=${DPI:-"$dpi"}
+
+#    echo "I: dpi output:  $output"
+#    echo "I: dpi default: $dpi"
 
     # save xrandr output as tmp data
     local tmp=$(mktemp $TMPDIR/x-dpi.XXXX)
@@ -194,13 +197,35 @@ function x-dpi()
 
     if test -n "$output"; then
 
-        if cat $tmp | egrep -e "^$output connected " | fgrep -e "mm x ">/dev/null 2>&1 ; then
-            # output connected and resolution + size (in mm) is known
-            $(cat $tmp | egrep -e "^$output connected " | perl -pe 's/.* (\d+)x(\d+)\+.* (\d+)mm x (\d+)mm/export x_px=\1 x_mm=\3 y_px=\2 y_mm=\4/g')
-            if test "$x_mm" = "0" -o "$y_mm" = "0" ; then
+        if cat $tmp | egrep -e "^$output connected " >/dev/null 2>&1 ; then
+#            echo "I: dpi output $output connected"
+            x_mm=
+            y_mm=
+            if cat $tmp | egrep -e "^$output connected " | fgrep -e "mm x ">/dev/null 2>&1 ; then
+                # output connected and resolution + size (in mm) is known
+                $(cat $tmp | egrep -e "^$output connected " | perl -pe 's/.* (\d+)x(\d+)\+.* (\d+)mm x (\d+)mm/export x_px=\1 x_mm=\3 y_px=\2 y_mm=\4/g')
+#                echo "I: dpi output $output dimensions ${x_mm}mm x ${y_mm}mm"
+                if test "$x_mm" = "0" ; then
+                    x_mm=
+                fi
+                if test "$y_mm" = "0" ; then
+                    y_mm=
+                fi
+            fi
+            if test -z "$x_mm" -o -z "$y_mm" ; then
                 # invalid dimensions
-                x_mm=$(perl -e "print(int(($x_px / $dpi) * 25.4))")
-                y_mm=$(perl -e "print(int(($y_px / $dpi) * 25.4))")
+                xrandr --output $output --noprimary --auto
+                while test -z "$x_mm" ; do
+                    sleep 1
+                    xrandr > $tmp
+                    $(cat $tmp | egrep -e "^$output connected " | perl -pe 's/.* (\d+)x(\d+)\+.* (\d+)mm x (\d+)mm/export x_px=\1 x_mm=\3 y_px=\2 y_mm=\4/g')
+                done
+                if test "$x_mm" = "0" -o "$y_mm" = "0" ; then
+                    x_mm=$(perl -e "print(int(($x_px / $dpi) * 25.4))")
+                    y_mm=$(perl -e "print(int(($y_px / $dpi) * 25.4))")
+                fi
+#                echo "I: dpi output $output dimensions after correction ${x_mm}mm x ${y_mm}mm"
+                xrandr --output $output --off
             fi
             if test -n "$x_px" -a -n "$x_mm" -a -n "$y_px" -a -n "$y_mm" ; then
                 # all the variables are extracted
@@ -227,8 +252,8 @@ function x-dpi()
 function x-dpi-apply()
 {
     local output=$(x-output "$1")
-    local dpi=$(x-dpi $output)
-    dpi=${2:-"$dpi"}
+    local dpi=$(x-dpi-calc $output)
+    dpi=${2:-$dpi}
     echo "I: dpi == $dpi"
     echo "Xft.dpi: $dpi" | xrdb -merge
     xrandr --dpi $dpi
@@ -243,8 +268,8 @@ function x-display()
     # --above, --below, --right-of, --left-of
     local extend_placement=${EXTEND_PLACEMENT:-"--above"}
 
-    local requested_dpi=${DPI:-$(x-dpi)}
     local requested_mode=${MODE:-""}
+    local requested_dpi=${DPI:-$(x-dpi-default)}
 
     # save xrandr output as tmp data
     local tmp=$(mktemp $TMPDIR/x-display.XXXX)
@@ -283,9 +308,9 @@ function x-display()
     fi
 
     # get DPI
-    local internal_dpi=$(x-dpi $internal)
+    local internal_dpi=$(x-dpi-default $internal)
     if test -n "$external" ; then
-        local external_dpi=$(x-dpi $external)
+        local external_dpi=$(x-dpi-calc $external)
     fi
 
     # find suitable internal and external mode
@@ -306,10 +331,11 @@ function x-display()
     echo "I: external                    = $external"
     echo "I: external_mode               = $external_mode"
     echo "I: external_dpi                = $external_dpi"
-    echo "I: requested_dpi               = $requested_dpi"
     echo "I: requested_mode              = $requested_mode"
+    echo "I: requested_dpi               = $requested_dpi"
     echo "I: action                      = $action"
     echo "I: extend                      = $extend_placement"
+    echo "I: DPI                         = $DPI"
     echo "I: GDK_SCALE                   = $GDK_SCALE"
     echo "I: GDK_DPI_SCALE               = $GDK_DPI_SCALE"
     xrdb -query | fgrep -e "Xft"
@@ -413,12 +439,14 @@ function x-external-display-off()
     # unset MODE
     # unset GDK_SCALE
     # unset GDK_DPI_SCALE
-    local dpi_default=$(x-dpi-default)
-    if test -z "$local_dpi" ; then
-        #local_dpi=120 # == 96 * 1.25 => 125% => valid for x390 FHD screen resolution
-        local_dpi=160 # == 96 * 1.67 => 166% => valid for t14s 2K screen resolution
+    local dpi=$(x-dpi-default)
+    if test -z "$dpi" ; then
+        # == 96 * 1.25 => 125% => valid for x390 FHD screen resolution
+        #dpi=120
+        # == 96 * 1.67 => 166% => valid for t14s 2K screen resolution
+        dpi=160
     fi
-    export DPI=$dpi_default
+    export DPI=$dpi
     x-display off
 }
 

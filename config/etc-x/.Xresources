@@ -28,8 +28,9 @@
 
 ! - - - -
 
+Xft.dpi: 115
 ! == 96 * 1.25 => 125% => valid for x390 FHD screen resolution
-Xft.dpi: 120
+!Xft.dpi: 120
 ! == 96 * 1.67 => 166% => valid for t14s 2K screen resolution
 !Xft.dpi: 160
 Xft.autohint: 0

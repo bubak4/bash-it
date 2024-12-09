@@ -171,6 +171,13 @@ function x-output()
     echo $output
 }
 
+function x-dpi-default()
+{
+    local xrdb_dpi=$(cat ~/.Xresources | grep -v -e "^[#!].*" | grep -F -e Xft.dpi | awk '{print $2}')
+    xrdb_dpi=${xrdb_dpi:-"96"}
+    echo $xrdb_dpi
+}
+
 # Computes DPI for specified output -- valid results can be computed
 # only for connected and active outputs.
 # Prints the result to stdout.
@@ -178,7 +185,8 @@ function x-output()
 function x-dpi()
 {
     local output=$(x-output "$1")
-    local dpi=${DPI:-"96"}
+    local dpi=$(x-dpi-default)
+    local dpi=${DPI:-"$dpi"}
 
     # save xrandr output as tmp data
     local tmp=$(mktemp $TMPDIR/x-dpi.XXXX)
@@ -189,6 +197,11 @@ function x-dpi()
         if cat $tmp | egrep -e "^$output connected " | fgrep -e "mm x ">/dev/null 2>&1 ; then
             # output connected and resolution + size (in mm) is known
             $(cat $tmp | egrep -e "^$output connected " | perl -pe 's/.* (\d+)x(\d+)\+.* (\d+)mm x (\d+)mm/export x_px=\1 x_mm=\3 y_px=\2 y_mm=\4/g')
+            if test "$x_mm" = "0" -o "$y_mm" = "0" ; then
+                # invalid dimensions
+                x_mm=$(perl -e "print(int(($x_px / $dpi) * 25.4))")
+                y_mm=$(perl -e "print(int(($y_px / $dpi) * 25.4))")
+            fi
             if test -n "$x_px" -a -n "$x_mm" -a -n "$y_px" -a -n "$y_mm" ; then
                 # all the variables are extracted
                 local x_dpi=$(perl -e "print(int($x_px / ($x_mm / 25.4)))")
@@ -213,7 +226,9 @@ function x-dpi()
 # Usage: x-dpi-apply eDP1 96
 function x-dpi-apply()
 {
-    local dpi=${2:-$(x-dpi $1)}
+    local output=$(x-output "$1")
+    local dpi=$(x-dpi $output)
+    dpi=${2:-"$dpi"}
     echo "I: dpi == $dpi"
     echo "Xft.dpi: $dpi" | xrdb -merge
     xrandr --dpi $dpi
@@ -398,12 +413,12 @@ function x-external-display-off()
     # unset MODE
     # unset GDK_SCALE
     # unset GDK_DPI_SCALE
-    local_dpi=$(cat ~/.Xresources | grep -F -e Xft.dpi | awk '{print $2}')
+    local dpi_default=$(x-dpi-default)
     if test -z "$local_dpi" ; then
         #local_dpi=120 # == 96 * 1.25 => 125% => valid for x390 FHD screen resolution
         local_dpi=160 # == 96 * 1.67 => 166% => valid for t14s 2K screen resolution
     fi
-    export DPI=$local_dpi
+    export DPI=$dpi_default
     x-display off
 }
 

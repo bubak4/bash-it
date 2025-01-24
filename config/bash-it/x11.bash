@@ -173,7 +173,7 @@ function x-output()
 
 function x-dpi-default()
 {
-    local dpi=$(cat ~/.Xresources | grep -v -e "^[#!].*" | grep -F -e Xft.dpi | awk '{print $2}')
+    local dpi=$(cat ~/.Xresources | grep -v -e "^[#\!].*" | grep -F -e Xft.dpi | awk '{print $2}')
     dpi=${DPI:-"$dpi"}
     dpi=${dpi:-"96"}
     echo $dpi

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2024-09-21 12:08:11 martin>
+# Time-stamp: <2025-02-22 19:40:26 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -79,16 +79,19 @@ function create_branches() {
 }
 
 function merge_all() {
-  $0 checkout master
-  $0 merge release
-  $0 merge dev
-
-  $0 checkout release
-  $0 merge master
-  $0 merge dev
+  for i in $default_branches ; do
+    $0 checkout $i
+    $0 pull
+  done
 
   $0 checkout dev
+  $0 merge release
   $0 merge master
+
+  $0 checkout release
+  $0 merge dev
+
+  $0 checkout master
   $0 merge release
 }
 

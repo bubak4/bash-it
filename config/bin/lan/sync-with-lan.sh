@@ -1,5 +1,6 @@
 #!/bin/bash
-# Time-stamp: <2025-02-09 07:34:15 martin>
+# Time-stamp: <2025-02-09 22:29:49 martin>
+# Synchronize local files with remote (lan) hosts.  Works only in one direction.
 
 target_hostnames="workbox.lan lanbox.lan"
 

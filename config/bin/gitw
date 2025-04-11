@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-02-22 19:40:26 martin>
+# Time-stamp: <2025-04-11 17:26:01 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -65,7 +65,10 @@ function run_command() {
   for repo in $REPOS ; do
     cd $repo
     comment_box $(basename $repo)
-    git "$@"
+    git "$@" || {
+      echo "Error: git $* in $repo"
+      exit 1
+    }
   done
   comment_box "Done: git $*"
 }

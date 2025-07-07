@@ -46,7 +46,7 @@ if [[ "$EDITOR" == *emacs ]] ; then
     if test ! -x $EDITOR ; then
         cat > $EDITOR <<'EOF'
 #!/bin/bash
-# copied from bash-it `editor.bash` setup script
+# created by `editor.bash` setup script (from custom .bash-it setup)
 function emacs-run()
 {
     emacs_cmd="emacsclient --create-frame --alternate-editor=$ALTERNATE_EDITOR"

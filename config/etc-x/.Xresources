@@ -28,9 +28,11 @@
 
 ! - - - -
 
-!Xft.dpi: 115
-! == 96 * 1.25 => 125% => valid for x390 FHD screen resolution
-!Xft.dpi: 120
+! 120 DPI = 1.25× scaling (125%) of 96 DPI (valid for x390 FHD screen resolution)
+! 144 DPI = 1.50× scaling (150%) of 96 DPI
+! 168 DPI = 1.75× scaling (175%) of 96 DPI
+! 192 DPI = 2.00× scaling (200%) of 96 DPI
+
 ! == 96 * 1.67 => 166% => valid for t14s/p14s 2K screen resolution
 Xft.dpi: 160
 Xft.autohint: 0

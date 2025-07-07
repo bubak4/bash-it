@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Time-stamp: <2024-11-12 16:59:42 martin>
+# Time-stamp: <2025-04-07 21:24:59 martin>
 # This script does not have to be processed by bash though it is declared as such
 
 #####################
@@ -49,8 +49,6 @@ if test -f ~/.Xresources ; then
     xrdb -merge ~/.Xresources
 fi
 
-# allow access to X to anyone from my OS group
-chmod g+r ~/.Xauthority
 # allow access to selected local users
 for i in martinx root ; do
     id $i>/dev/null && xhost +si:localuser:$i

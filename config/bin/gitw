@@ -1,11 +1,11 @@
 #!/bin/bash
-# Time-stamp: <2025-05-28 13:23:21 martin>
+# Time-stamp: <2025-07-15 14:12:05 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 # cd $SCRIPTPATH || exit 1
 
-UPSTREAM=${UPSTREAM_REPO:-"origin"}
+UPSTREAM=${UPSTREAM:-"origin"}
 MASTER_BRANCH=${MASTER_BRANCH:-"master"}
 DEFAULT_BRANCHES=${DEFAULT_BRANCHES:-"master release dev"}
 
@@ -92,7 +92,7 @@ function create_default_branches() {
 function merge_all() {
   for i in $DEFAULT_BRANCHES ; do
     $0 checkout $i
-    $0 pull
+    $0 --set-upstream $UPSTREAM pull
   done
 
   log=""

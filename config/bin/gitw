@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-07-21 14:35:29 martin>
+# Time-stamp: <2025-07-28 19:48:30 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -43,16 +43,19 @@ function comment_box() {
 
 function find_config() {
   local cwd=$(pwd)
-  local cfg=".gitwrapper"
+  local cfg_files=".gitwrapper .gitw"
 
   # Loop until we find .git-mine or reach the home directory
   while test "$cwd" != "/" ; do
-    if test -f "$cwd/$cfg" ; then
-      echo "${cwd}/${cfg}"
-      break
-    fi
+    for cfg in $cfg_files ; do
+      if test -f "$cwd/$cfg" ; then
+        echo "${cwd}/${cfg}"
+        return 0
+      fi
+    done
     cwd=$(dirname "$cwd")
   done
+  return 1
 }
 
 # $1 .. cfg
@@ -135,8 +138,12 @@ function push_all() {
   echo -e $log
 }
 
-cfg=$(find_config)
-REPOS=$(find_repos $cfg)
+if cfg=$(find_config) ; then
+  REPOS=$(find_repos $cfg)
+else
+  echo "Unable to find config file (.gitwrapper or .gitw)"
+  exit 1
+fi
 
 if test "$1" = "cmd-merge" ; then
   echo "Using default branches: $DEFAULT_BRANCHES"

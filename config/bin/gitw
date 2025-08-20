@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-08-20 11:36:30 martin>
+# Time-stamp: <2025-08-20 11:59:15 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -109,7 +109,7 @@ function create_default_branches() {
 function merge_all() {
   for i in "${BRANCH_ARRAY[@]}"; do
     $0 checkout $i
-    $0 pull $UPSTREAM
+    $0 pull $UPSTREAM $i
   done
 
   log=""

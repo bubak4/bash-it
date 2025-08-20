@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-07-28 19:48:30 martin>
+# Time-stamp: <2025-08-20 11:36:30 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -88,8 +88,8 @@ function run_command() {
     cd $repo
     comment_line $(basename $repo)
     git "$@" || {
-      echo "Error: git $* in $repo"
-      exit 1
+      echo "ERROR: \"git $*\" in $repo"
+      #exit 1
     }
   done
   comment_box "Done: git $*"
@@ -109,7 +109,7 @@ function create_default_branches() {
 function merge_all() {
   for i in "${BRANCH_ARRAY[@]}"; do
     $0 checkout $i
-    $0 --set-upstream $UPSTREAM pull
+    $0 pull $UPSTREAM
   done
 
   log=""
@@ -124,6 +124,7 @@ function merge_all() {
     done
   done
   comment_box "$(comment_line "Merge Summary")"
+  echo -e "\nUPSTREAM=$UPSTREAM"
   echo -e $log
 }
 
@@ -135,6 +136,7 @@ function push_all() {
     log="$log\npush ${UPSTREAM}/${i}"
   done
   comment_box "$(comment_line "Push Summary")"
+  echo -e "\nUPSTREAM=$UPSTREAM"
   echo -e $log
 }
 

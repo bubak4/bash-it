@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-08-20 11:59:15 martin>
+# Time-stamp: <2025-08-27 22:53:22 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -12,12 +12,11 @@ DEFAULT_BRANCHES=${DEFAULT_BRANCHES:-"master,release,dev"}
 # parse the DEFAULT_BRANCHES variable into an array
 IFS=',' read -ra BRANCH_ARRAY <<< "$DEFAULT_BRANCHES"
 for branch in "${BRANCH_ARRAY[@]}"; do
-    # Your processing logic here
-    echo "Working on branch: $branch"
+    echo "Working on branch: $branch" >/dev/null # just suppress the notification
 done
 
 function usage() {
-  echo "Usage: $(basename $0) [cmd-merge|cmd-push|<git-command>]"
+  echo "Usage: $(basename $0) [cmd-merge|cmd-push|cmd-log|<git-command>]"
   echo
   echo "Environment variables:"
   echo "  UPSTREAM=$UPSTREAM   ... set to upstream name"
@@ -140,6 +139,79 @@ function push_all() {
   echo -e $log
 }
 
+function log_unpushued() {
+  local logfile=$(mktemp /tmp/gitw-log.XXXXXX) || exit 1
+  # Check if upstream exists, otherwise use origin/current_branch
+  if git rev-parse --verify "@{upstream}" >/dev/null 2>&1; then
+    gitw --no-pager log --pretty=format:%s "@{upstream}..HEAD" > $logfile
+  else
+    current_branch=$(git rev-parse --abbrev-ref HEAD)
+    gitw --no-pager log --pretty=format:%s "origin/$current_branch..HEAD" 2>/dev/null || echo "No remote branch found" > $logfile
+  fi
+
+  cat $logfile | \
+    awk '
+    # Step 1: Remove all empty lines and collect non-empty lines
+    NF > 0 { lines[++count] = $0 }
+
+    END {
+        # Step 2: Process each line and handle patterns
+        for (i = 1; i <= count; i++) {
+            line = lines[i]
+
+            # First handle +...+ pattern (only if in middle of line)
+            if (match(line, /\+[^+]+\+/)) {
+                before_plus = substr(line, 1, RSTART-1)
+                plus_pattern = substr(line, RSTART, RLENGTH)
+                after_plus = substr(line, RSTART+RLENGTH)
+
+                # Clean up whitespace
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", before_plus)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", after_plus)
+
+                # Only process if +...+ starts in the middle (has content before, but no content after)
+                if (before_plus != "" && after_plus == "") {
+                    print before_plus
+                    print ""
+                    print plus_pattern
+                    continue  # Skip to next line
+                }
+                # If not in middle, fall through to process normally
+            }
+
+            # Then handle >>...<< pattern
+            if (match(line, />>[^<]*<</)) {
+                before = substr(line, 1, RSTART-1)
+                pattern = substr(line, RSTART, RLENGTH)
+                after = substr(line, RSTART+RLENGTH)
+
+                # Clean up whitespace
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", before)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", after)
+
+                # Print before text if it exists
+                if (before != "") {
+                    print before
+                }
+
+                # Always add empty line before pattern
+                print ""
+                print pattern
+                print ""
+
+                # Print after text if it exists
+                if (after != "") {
+                    print after
+                }
+            } else {
+                # Regular line - just print it
+                print line
+            }
+        }
+    }'
+  rm -f $logfile
+}
+
 if cfg=$(find_config) ; then
   REPOS=$(find_repos $cfg)
 else
@@ -153,6 +225,8 @@ if test "$1" = "cmd-merge" ; then
 elif test "$1" = "cmd-push" ; then
   echo "Using default branches: $DEFAULT_BRANCHES"
   push_all
+elif test "$1" = "cmd-log" ; then
+  log_unpushued
 elif test -z "$1" ; then
   usage
 else

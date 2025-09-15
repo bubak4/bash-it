@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-08-27 22:53:22 martin>
+# Time-stamp: <2025-09-05 16:35:12 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -16,7 +16,15 @@ for branch in "${BRANCH_ARRAY[@]}"; do
 done
 
 function usage() {
-  echo "Usage: $(basename $0) [cmd-merge|cmd-push|cmd-log|<git-command>]"
+  echo "Usage: $(basename $0) [cmd-merge|cmd-push|cmd-log|branch-{create|delete|list}|<git-command>]"
+  echo
+  echo "cmd-merge                ... merge all default branches into each other"
+  echo "cmd-push                 ... push all default branches to upstream"
+  echo "cmd-log                  ... log unpushed commits to upstream"
+  echo "branch-create <branch>   ... create a new branch in all repos based on current branch"
+  echo "branch-delete <branch>   ... delete a branch in all repos (both local and remote)"
+  echo "branch-list              ... list all branches in all repos"
+  echo "<git-command>            ... any git command, e.g. status, pull, checkout, commit, push, merge, etc."
   echo
   echo "Environment variables:"
   echo "  UPSTREAM=$UPSTREAM   ... set to upstream name"
@@ -212,6 +220,39 @@ function log_unpushued() {
   rm -f $logfile
 }
 
+function branch_create() {
+  local branch_name="$1"
+  if test -z "$branch_name" ; then
+    echo "branch-create requires a branch name"
+    exit 1
+  fi
+  # Create branch in all repos based on current branch
+  run_command checkout -b "$branch_name"
+  # Push branch to upstream and track it
+  run_command push --set-upstream "$UPSTREAM" "$branch_name"
+}
+
+function branch_delete() {
+  local branch_name="$1"
+  if test -z "$branch_name" ; then
+    echo "branch-delete requires a branch name"
+    exit 1
+  fi
+  # Local deletion
+  #run_command branch --delete --force "$branch_name"
+  run_command branch --delete "$branch_name"
+  # Remote deletion
+  run_command push origin --delete your-branch-name
+}
+
+function branch_list() {
+  run_command --no-pager branch --remotes --all --verbose
+}
+
+########
+# main #
+########
+
 if cfg=$(find_config) ; then
   REPOS=$(find_repos $cfg)
 else
@@ -227,6 +268,12 @@ elif test "$1" = "cmd-push" ; then
   push_all
 elif test "$1" = "cmd-log" ; then
   log_unpushued
+elif test "$1" = "branch-create" ; then
+  branch_create "$2"
+elif test "$1" = "branch-delete" ; then
+  branch_delete "$2"
+elif test "$1" = "branch-list" ; then
+  branch_list
 elif test -z "$1" ; then
   usage
 else

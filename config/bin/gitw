@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-10-11 11:53:35 martin>
+# Time-stamp: <2025-10-11 12:59:06 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -243,7 +243,7 @@ function branch_delete() {
     #run_command branch --delete --force "$branch_name"
     run_command branch --delete "$branch_name"
     # Remote deletion
-    run_command push origin --delete your-branch-name
+    run_command push origin --delete "$branch_name"
 }
 
 function branch_list() {

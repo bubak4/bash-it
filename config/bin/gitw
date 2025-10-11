@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-09-05 16:35:12 martin>
+# Time-stamp: <2025-10-11 11:53:35 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -8,6 +8,7 @@
 UPSTREAM=${UPSTREAM:-"origin"}
 MASTER_BRANCH=${MASTER_BRANCH:-"master"}
 DEFAULT_BRANCHES=${DEFAULT_BRANCHES:-"master,release,dev"}
+REPOS="" # will be set later from config file
 
 # parse the DEFAULT_BRANCHES variable into an array
 IFS=',' read -ra BRANCH_ARRAY <<< "$DEFAULT_BRANCHES"
@@ -16,149 +17,149 @@ for branch in "${BRANCH_ARRAY[@]}"; do
 done
 
 function usage() {
-  echo "Usage: $(basename $0) [cmd-merge|cmd-push|cmd-log|branch-{create|delete|list}|<git-command>]"
-  echo
-  echo "cmd-merge                ... merge all default branches into each other"
-  echo "cmd-push                 ... push all default branches to upstream"
-  echo "cmd-log                  ... log unpushed commits to upstream"
-  echo "branch-create <branch>   ... create a new branch in all repos based on current branch"
-  echo "branch-delete <branch>   ... delete a branch in all repos (both local and remote)"
-  echo "branch-list              ... list all branches in all repos"
-  echo "<git-command>            ... any git command, e.g. status, pull, checkout, commit, push, merge, etc."
-  echo
-  echo "Environment variables:"
-  echo "  UPSTREAM=$UPSTREAM   ... set to upstream name"
-  echo "  MASTER_BRANCH=$MASTER_BRANCH   ... set to name of a master/main branch"
-  echo "  DEFAULT_BRANCHES=$DEFAULT_BRANCHES   ... set to name of a branches that are used for cmd-merge/cmd-push commands"
-  exit 1
+    echo "Usage: $(basename $0) [cmd-merge|cmd-push|cmd-log|branch-{create|delete|list}|<git-command>]"
+    echo
+    echo "cmd-merge                ... merge all default branches into each other"
+    echo "cmd-push                 ... push all default branches to upstream"
+    echo "cmd-log                  ... log unpushed commits to upstream"
+    echo "branch-create <branch>   ... create a new branch in all repos based on current branch"
+    echo "branch-delete <branch>   ... delete a branch in all repos (both local and remote)"
+    echo "branch-list              ... list all branches in all repos"
+    echo "<git-command>            ... any git command, e.g. status, pull, checkout, commit, push, merge, etc."
+    echo
+    echo "Environment variables:"
+    echo "  UPSTREAM=$UPSTREAM   ... set to upstream name"
+    echo "  MASTER_BRANCH=$MASTER_BRANCH   ... set to name of a master/main branch"
+    echo "  DEFAULT_BRANCHES=$DEFAULT_BRANCHES   ... set to name of a branches that are used for cmd-merge/cmd-push commands"
+    exit 1
 }
 
 function comment_line() {
-  local text="$1"
-  echo ">> $text <<"
+    local text="$1"
+    echo ">> $text <<"
 }
 
 function comment_box() {
-  local text="$1"
-  local length=${#text}
-  local border=$(printf '+%*s+\n' "$((length + 2))" '' | tr ' ' '-')
+    local text="$1"
+    local length=${#text}
+    local border=$(printf '+%*s+\n' "$((length + 2))" '' | tr ' ' '-')
 
-  echo "$border"
-  echo "| $text |"
-  echo "$border"
+    echo "$border"
+    echo "| $text |"
+    echo "$border"
 }
 
 function find_config() {
-  local cwd=$(pwd)
-  local cfg_files=".gitwrapper .gitw"
+    local cwd=$(pwd)
+    local cfg_files=".gitwrapper .gitw"
 
-  # Loop until we find .git-mine or reach the home directory
-  while test "$cwd" != "/" ; do
-    for cfg in $cfg_files ; do
-      if test -f "$cwd/$cfg" ; then
-        echo "${cwd}/${cfg}"
-        return 0
-      fi
+    # Loop until we find .git-mine or reach the home directory
+    while test "$cwd" != "/" ; do
+        for cfg in $cfg_files ; do
+            if test -f "$cwd/$cfg" ; then
+                echo "${cwd}/${cfg}"
+                return 0
+            fi
+        done
+        cwd=$(dirname "$cwd")
     done
-    cwd=$(dirname "$cwd")
-  done
-  return 1
+    return 1
 }
 
 # $1 .. cfg
 function find_repos() {
-  local cfg=$1
+    local cfg=$1
 
-  if test -z "$cfg" ; then
-    echo "unable to find config"
-    exit 1
-  fi
-
-  for i in $(cat $cfg) ; do
-    repo=$(realpath $(dirname $cfg)/$i)
-    if test -d $repo -a -d $repo/.git ; then
-      echo "$repo"
+    if test -z "$cfg" ; then
+        echo "unable to find config"
+        exit 1
     fi
-  done
+
+    for i in $(cat $cfg) ; do
+        repo=$(realpath $(dirname $cfg)/$i)
+        if test -d $repo -a -d $repo/.git ; then
+            echo "$repo"
+        fi
+    done
 }
 
 # does not work very well (symlinks, terraform module referencing .git tags etc.)
 function find_repos_fallback() {
-  find $(pwd) -name .git -exec dirname {} \; 2>/dev/null
+    find $(pwd) -name .git -exec dirname {} \; 2>/dev/null
 }
 
 # "$@" .. command pass to git over repos
 # uses global REPOS variable
 function run_command() {
-  comment_box "Running: git $*"
-  for repo in $REPOS ; do
-    cd $repo
-    comment_line $(basename $repo)
-    git "$@" || {
-      echo "ERROR: \"git $*\" in $repo"
-      #exit 1
-    }
-  done
-  comment_box "Done: git $*"
+    comment_box "Running: git $*"
+    for repo in $REPOS ; do
+        cd $repo
+        comment_line $(basename $repo)
+        git "$@" || {
+            echo "ERROR: \"git $*\" in $repo"
+            #exit 1
+        }
+    done
+    comment_box "Done: git $*"
 }
 
 function create_default_branches() {
-  $0 checkout $MASTER_BRANCH
-  for i in "${BRANCH_ARRAY[@]}"; do
-    if test "$i" = "$MASTER_BRANCH" ; then
-      continue
-    fi
-    $0 checkout -b $i $MASTER_BRANCH
-    $0 push -u $UPSTREAM $i
-  done
+    $0 checkout $MASTER_BRANCH
+    for i in "${BRANCH_ARRAY[@]}"; do
+        if test "$i" = "$MASTER_BRANCH" ; then
+            continue
+        fi
+        $0 checkout -b $i $MASTER_BRANCH
+        $0 push -u $UPSTREAM $i
+    done
 }
 
 function merge_all() {
-  for i in "${BRANCH_ARRAY[@]}"; do
-    $0 checkout $i
-    $0 pull $UPSTREAM $i
-  done
-
-  log=""
-  for i in "${BRANCH_ARRAY[@]}"; do
-    $0 checkout $i
-    for j in "${BRANCH_ARRAY[@]}"; do
-      if test "$i" = "$j" ; then
-        continue
-      fi
-      $0 merge $j
-      log="$log\nmerge $i -> $j"
+    for i in "${BRANCH_ARRAY[@]}"; do
+        $0 checkout $i
+        $0 pull $UPSTREAM $i
     done
-  done
-  comment_box "$(comment_line "Merge Summary")"
-  echo -e "\nUPSTREAM=$UPSTREAM"
-  echo -e $log
+
+    log=""
+    for i in "${BRANCH_ARRAY[@]}"; do
+        $0 checkout $i
+        for j in "${BRANCH_ARRAY[@]}"; do
+            if test "$i" = "$j" ; then
+                continue
+            fi
+            $0 merge $j
+            log="$log\nmerge $i -> $j"
+        done
+    done
+    comment_box "$(comment_line "Merge Summary")"
+    echo -e "\nUPSTREAM=$UPSTREAM"
+    echo -e $log
 }
 
 function push_all() {
-  log=""
-  for i in "${BRANCH_ARRAY[@]}"; do
-    $0 checkout $i
-    $0 push "$UPSTREAM"
-    log="$log\npush ${UPSTREAM}/${i}"
-  done
-  comment_box "$(comment_line "Push Summary")"
-  echo -e "\nUPSTREAM=$UPSTREAM"
-  echo -e $log
+    log=""
+    for i in "${BRANCH_ARRAY[@]}"; do
+        $0 checkout $i
+        $0 push "$UPSTREAM"
+        log="$log\npush ${UPSTREAM}/${i}"
+    done
+    comment_box "$(comment_line "Push Summary")"
+    echo -e "\nUPSTREAM=$UPSTREAM"
+    echo -e $log
 }
 
 function log_unpushued() {
-  local logfile=$(mktemp /tmp/gitw-log.XXXXXX) || exit 1
-  # Check if upstream exists, otherwise use origin/current_branch
-  if git rev-parse --verify "@{upstream}" >/dev/null 2>&1; then
-    gitw --no-pager log --pretty=format:%s "@{upstream}..HEAD" > $logfile
-  else
-    current_branch=$(git rev-parse --abbrev-ref HEAD)
-    gitw --no-pager log --pretty=format:%s "origin/$current_branch..HEAD" 2>/dev/null || echo "No remote branch found" > $logfile
-  fi
+    local logfile=$(mktemp /tmp/gitw-log.XXXXXX) || exit 1
+    # Check if upstream exists, otherwise use origin/current_branch
+    if git rev-parse --verify "@{upstream}" >/dev/null 2>&1; then
+        gitw --no-pager log --pretty=format:%s "@{upstream}..HEAD" > $logfile
+    else
+        current_branch=$(git rev-parse --abbrev-ref HEAD)
+        gitw --no-pager log --pretty=format:%s "origin/$current_branch..HEAD" 2>/dev/null || echo "No remote branch found" > $logfile
+    fi
 
-  cat $logfile | \
-    awk '
+    cat $logfile | \
+        awk '
     # Step 1: Remove all empty lines and collect non-empty lines
     NF > 0 { lines[++count] = $0 }
 
@@ -217,36 +218,36 @@ function log_unpushued() {
             }
         }
     }'
-  rm -f $logfile
+    rm -f $logfile
 }
 
 function branch_create() {
-  local branch_name="$1"
-  if test -z "$branch_name" ; then
-    echo "branch-create requires a branch name"
-    exit 1
-  fi
-  # Create branch in all repos based on current branch
-  run_command checkout -b "$branch_name"
-  # Push branch to upstream and track it
-  run_command push --set-upstream "$UPSTREAM" "$branch_name"
+    local branch_name="$1"
+    if test -z "$branch_name" ; then
+        echo "branch-create requires a branch name"
+        exit 1
+    fi
+    # Create branch in all repos based on current branch
+    run_command checkout -b "$branch_name"
+    # Push branch to upstream and track it
+    run_command push --set-upstream "$UPSTREAM" "$branch_name"
 }
 
 function branch_delete() {
-  local branch_name="$1"
-  if test -z "$branch_name" ; then
-    echo "branch-delete requires a branch name"
-    exit 1
-  fi
-  # Local deletion
-  #run_command branch --delete --force "$branch_name"
-  run_command branch --delete "$branch_name"
-  # Remote deletion
-  run_command push origin --delete your-branch-name
+    local branch_name="$1"
+    if test -z "$branch_name" ; then
+        echo "branch-delete requires a branch name"
+        exit 1
+    fi
+    # Local deletion
+    #run_command branch --delete --force "$branch_name"
+    run_command branch --delete "$branch_name"
+    # Remote deletion
+    run_command push origin --delete your-branch-name
 }
 
 function branch_list() {
-  run_command --no-pager branch --remotes --all --verbose
+    run_command --no-pager branch --remotes --all --verbose
 }
 
 ########
@@ -254,28 +255,31 @@ function branch_list() {
 ########
 
 if cfg=$(find_config) ; then
-  REPOS=$(find_repos $cfg)
+    REPOS=$(find_repos $cfg)
 else
-  echo "Unable to find config file (.gitwrapper or .gitw)"
-  exit 1
+    echo "Unable to find config file (.gitwrapper or .gitw)"
+    exit 1
 fi
 
 if test "$1" = "cmd-merge" ; then
-  echo "Using default branches: $DEFAULT_BRANCHES"
-  merge_all
+    echo "Using default branches: $DEFAULT_BRANCHES"
+    merge_all
 elif test "$1" = "cmd-push" ; then
-  echo "Using default branches: $DEFAULT_BRANCHES"
-  push_all
+    echo "Using default branches: $DEFAULT_BRANCHES"
+    push_all
 elif test "$1" = "cmd-log" ; then
-  log_unpushued
+    log_unpushued
 elif test "$1" = "branch-create" ; then
-  branch_create "$2"
+    branch_create "$2"
 elif test "$1" = "branch-delete" ; then
-  branch_delete "$2"
+    branch_delete "$2"
 elif test "$1" = "branch-list" ; then
-  branch_list
+    branch_list
+elif test "$1" = "repos-list" ; then
+    echo "Using config: $cfg"
+    echo "$REPOS"
 elif test -z "$1" ; then
-  usage
+    usage
 else
-  run_command "$@"
+    run_command "$@"
 fi

@@ -1,7 +1,14 @@
 # shellcheck shell=bash
+
+cite "about-completion"
+about-completion "ssh - secure shell remote login and command execution"
+group "networking"
+url "https://www.openssh.com/"
+
 # Bash completion support for ssh.
 
-export COMP_WORDBREAKS=${COMP_WORDBREAKS/\:/}
+# Remove : and @ from COMP_WORDBREAKS to support user@host completion
+export COMP_WORDBREAKS=${COMP_WORDBREAKS//[:@]/}
 
 _sshcomplete() {
 	local line CURRENT_PROMPT="${COMP_WORDS[COMP_CWORD]}"

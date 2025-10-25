@@ -1,8 +1,16 @@
 # shellcheck shell=bash
 # bash completion for pack                                 -*- shell-script -*-
 
+# Requires bash 4+ for associative arrays
+# Skip loading if bash version is too old
+if [[ "${BASH_VERSINFO[0]}" -lt 4 ]]; then
+	_disable-plugin pack
+	return 0
+fi
+
 cite about-plugin
 about-plugin 'CNB pack cli aliases'
+url "https://buildpacks.io/"
 
 __pack_debug() {
 	if [[ -n ${BASH_COMP_DEBUG_FILE} ]]; then

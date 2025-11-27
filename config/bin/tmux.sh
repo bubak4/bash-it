@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-12-29 02:22:29 martin>
+# Time-stamp: <2025-11-27 07:16:12 martin>
 
 tmux new-session -d -s main
 
@@ -11,7 +11,7 @@ tmux new-window -n "ROOT" -t main 'su -'
 
 # logging
 which multitail && [[ -f /var/log/syslog ]] && \
-    tmux new-window -n "syslog" -t main "sudo multitail --mergeall /var/log/syslog"
+    tmux new-window -n "syslog" -t main "sudo multitail --follow-all --mergeall /var/log/syslog"
 
 # htop
 which htop && \

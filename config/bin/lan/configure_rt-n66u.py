@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Time-stamp: <2025-01-23 18:12:40 martin>
+# Time-stamp: <2025-12-08 08:37:39 martin>
 """
 Simple script to configure DNS for home lan network.
 """
@@ -44,6 +44,7 @@ ETC_DNSMASQ_CONF_LAN = """
 192.168.1.20     hp-printer.lan         hp-printer
 192.168.1.21     t14s.lan               t14s
 192.168.1.22     p14s.lan               p14s
+192.168.1.23     p14s2.lan              p14s2
 """
 
 logging.basicConfig(

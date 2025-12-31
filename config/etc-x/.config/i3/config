@@ -227,7 +227,7 @@ bar {
         colors {
                 # background #000000af # last two characters define transparency 00-ff
                 background $bar-in-bgcolor
-                statusline $bar-text
+                statusline $text
                 #                       border          background      text
                 focused_workspace       $bar-bgcolor    $bar-bgcolor    $text
                 inactive_workspace      $bar-in-bgcolor $in-bgcolor     $in-text

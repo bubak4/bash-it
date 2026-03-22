@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-11-27 07:16:12 martin>
+# Time-stamp: <2026-02-24 21:16:08 martin>
 
 tmux new-session -d -s main
 
@@ -22,8 +22,8 @@ which htop && \
     tmux new-window -n "x11vnc" -t main 'while true ; do x11vnc -rfbport 5900 ; done'
 
 # bookworm chroot (i386)
-which schroot && [[ -f /etc/schroot/chroot.d/bookworm.conf ]] && \
-    tmux new-window -n "i386 chroot" -t main 'schroot -c bookworm'
+#which schroot && [[ -f /etc/schroot/chroot.d/bookworm.conf ]] && \
+#    tmux new-window -n "i386 chroot" -t main 'schroot -c bookworm'
 
 # attach main session with ROOT shell preselected
 tmux select-window -t main:2

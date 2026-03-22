@@ -2,24 +2,41 @@
 #
 # Functions for measuring and reporting how long a command takes to run.
 
+# Notice: This function used to run as a sub-shell while defining:
+# local LC_ALL=C
+#
+# DFARREL You would think LC_NUMERIC would do it, but not working in my local.
+# Note: LC_ALL='en_US.UTF-8' has been used to enforce the decimal point to be
+# a period, but the specific locale 'en_US.UTF-8' is not ensured to exist in
+# the system.  One should instead use the locale 'C', which is ensured by the
+# C and POSIX standards.
+#
+# We now use EPOCHREALTIME, while replacing any non-digit character by a period.
+#
+# Technically, one can define a locale with decimal_point being an arbitrary string.
+# For example, ps_AF uses U+066B as the decimal point.
+#
+# cf: https://github.com/Bash-it/bash-it/pull/2366#discussion_r2760681820
+#
 # Get shell duration in decimal format regardless of runtime locale.
-# Notice: This function runs as a sub-shell - notice '(' vs '{'.
-function _shell_duration_en() (
-	# DFARREL You would think LC_NUMERIC would do it, but not working in my local.
-	# Note: LC_ALL='en_US.UTF-8' has been used to enforce the decimal point to be
-	# a period, but the specific locale 'en_US.UTF-8' is not ensured to exist in
-	# the system.  One should instead use the locale 'C', which is ensured by the
-	# C and POSIX standards.
-	local LC_ALL=C
-	printf "%s" "${EPOCHREALTIME:-$SECONDS}"
-)
+function _command_duration_current_time() {
+	local current_time
+	if [[ -n "${EPOCHREALTIME:-}" ]]; then
+		current_time="${EPOCHREALTIME//[!0-9]/.}"
+	else
+		current_time="$SECONDS"
+	fi
 
-: "${COMMAND_DURATION_START_SECONDS:=$(_shell_duration_en)}"
+	echo "$current_time"
+}
+
+: "${COMMAND_DURATION_START_SECONDS:=$(_command_duration_current_time)}"
 : "${COMMAND_DURATION_ICON:=🕘}"
 : "${COMMAND_DURATION_MIN_SECONDS:=1}"
+: "${COMMAND_DURATION_PRECISION:=1}"
 
 function _command_duration_pre_exec() {
-	COMMAND_DURATION_START_SECONDS="$(_shell_duration_en)"
+	COMMAND_DURATION_START_SECONDS="$(_command_duration_current_time)"
 }
 
 function _command_duration_pre_cmd() {
@@ -27,10 +44,16 @@ function _command_duration_pre_cmd() {
 }
 
 function _dynamic_clock_icon {
-	local clock_hand
+	local clock_hand duration="$1"
+
+	# Clock only work for time >= 1s
+	if ((duration < 1)); then
+		duration=1
+	fi
+
 	# clock hand value is between 90 and 9b in hexadecimal.
 	# so between 144 and 155 in base 10.
-	printf -v clock_hand '%x' $((((${1:-${SECONDS}} - 1) % 12) + 144))
+	printf -v clock_hand '%x' $((((${duration:-${SECONDS}} - 1) % 12) + 144))
 	printf -v 'COMMAND_DURATION_ICON' '%b' "\xf0\x9f\x95\x$clock_hand"
 }
 
@@ -38,29 +61,34 @@ function _command_duration() {
 	[[ -n "${BASH_IT_COMMAND_DURATION:-}" ]] || return
 	[[ -n "${COMMAND_DURATION_START_SECONDS:-}" ]] || return
 
-	local command_duration=0 command_start="${COMMAND_DURATION_START_SECONDS:-0}"
-	local -i minutes=0 seconds=0 deciseconds=0
-	local -i command_start_seconds="${command_start%.*}"
-	local -i command_start_deciseconds=$((10#${command_start##*.}))
-	command_start_deciseconds="${command_start_deciseconds:0:1}"
 	local current_time
-	current_time="$(_shell_duration_en)"
-	local -i current_time_seconds="${current_time%.*}"
-	local -i current_time_deciseconds="$((10#${current_time##*.}))"
-	current_time_deciseconds="${current_time_deciseconds:0:1}"
+	current_time="$(_command_duration_current_time)"
 
-	if [[ "${command_start_seconds:-0}" -gt 0 ]]; then
-		# seconds
-		command_duration="$((current_time_seconds - command_start_seconds))"
+	local -i command_duration=0
+	local -i minutes=0 seconds=0
+	local microseconds=""
 
-		if ((current_time_deciseconds >= command_start_deciseconds)); then
-			deciseconds="$((current_time_deciseconds - command_start_deciseconds))"
+	local -i command_start_seconds=${COMMAND_DURATION_START_SECONDS%.*}
+	local -i current_time_seconds=${current_time%.*}
+
+	# Calculate seconds difference
+	command_duration=$((current_time_seconds - command_start_seconds))
+
+	# Calculate microseconds if both timestamps have fractional parts
+	if [[ "$COMMAND_DURATION_START_SECONDS" == *.* ]] && [[ "$current_time" == *.* ]] && ((COMMAND_DURATION_PRECISION > 0)); then
+		local -i command_start_microseconds=$((10#${COMMAND_DURATION_START_SECONDS##*.}))
+		local -i current_time_microseconds=$((10#${current_time##*.}))
+
+		if ((current_time_microseconds >= command_start_microseconds)); then
+			microseconds=$((current_time_microseconds - command_start_microseconds))
 		else
 			((command_duration -= 1))
-			deciseconds="$((10 - (command_start_deciseconds - current_time_deciseconds)))"
+			microseconds=$((1000000 + current_time_microseconds - command_start_microseconds))
 		fi
-	else
-		command_duration=0
+
+		# Pad with leading zeros to 6 digits, then take first N digits
+		printf -v microseconds '%06d' "$microseconds"
+		microseconds="${microseconds:0:$COMMAND_DURATION_PRECISION}"
 	fi
 
 	if ((command_duration >= COMMAND_DURATION_MIN_SECONDS)); then
@@ -71,7 +99,7 @@ function _command_duration() {
 		if ((minutes > 0)); then
 			printf "%s %s%dm %ds" "${COMMAND_DURATION_ICON:-}" "${COMMAND_DURATION_COLOR:-}" "$minutes" "$seconds"
 		else
-			printf "%s %s%d.%01ds" "${COMMAND_DURATION_ICON:-}" "${COMMAND_DURATION_COLOR:-}" "$seconds" "$deciseconds"
+			printf "%s %s%ss" "${COMMAND_DURATION_ICON:-}" "${COMMAND_DURATION_COLOR:-}" "$seconds${microseconds:+.$microseconds}"
 		fi
 	fi
 }

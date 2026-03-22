@@ -18,6 +18,7 @@
 #
 aliases/
 completion/
+custom/example.bash
 docs/
 hooks/
 lib/

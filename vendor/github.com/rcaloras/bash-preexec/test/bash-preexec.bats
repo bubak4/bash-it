@@ -8,9 +8,23 @@ setup() {
   source "${BATS_TEST_DIRNAME}/../bash-preexec.sh"
 }
 
+# Evaluates all the elements of PROMPT_COMMAND
+eval_PROMPT_COMMAND() {
+  local prompt_command
+  for prompt_command in "${PROMPT_COMMAND[@]}"; do
+    eval "$prompt_command"
+  done
+}
+
+# Joins the elements of PROMPT_COMMAND with $'\n'
+join_PROMPT_COMMAND() {
+  local IFS=$'\n'
+  echo "${PROMPT_COMMAND[*]}"
+}
+
 bp_install() {
   __bp_install_after_session_init
-  eval "$PROMPT_COMMAND"
+  eval_PROMPT_COMMAND
 }
 
 test_echo() {
@@ -21,11 +35,32 @@ test_preexec_echo() {
   printf "%s\n" "$1"
 }
 
-@test "__bp_install_after_session_init should exit with 1 if we're not using bash" {
+# Helper functions necessary because Bats' run doesn't preserve $?
+return_exit_code() {
+  return $1
+}
+
+set_exit_code_and_run_precmd() {
+  return_exit_code "${1:-0}"
+  __bp_precmd_invoke_cmd
+}
+
+
+@test "sourcing bash-preexec should exit with 1 if we're not using bash" {
   unset BASH_VERSION
-  run '__bp_install_after_session_init'
+  run source "${BATS_TEST_DIRNAME}/../bash-preexec.sh"
   [ $status -eq 1 ]
   [ -z "$output" ]
+}
+
+@test "sourcing bash-preexec should exit with 1 if we're using an older version of bash" {
+  if type -p bash-3.0 &>/dev/null; then
+    run bash-3.0 -c "source \"${BATS_TEST_DIRNAME}/../bash-preexec.sh\""
+    [ "$status" -eq 1 ]
+    [ -z "$output" ]
+  else
+    skip
+  fi
 }
 
 @test "__bp_install should exit if it's already installed" {
@@ -39,13 +74,14 @@ test_preexec_echo() {
 @test "__bp_install should remove trap logic and itself from PROMPT_COMMAND" {
   __bp_install_after_session_init
 
-  [[ "$PROMPT_COMMAND" == *"trap - DEBUG"* ]] || return 1
-  [[ "$PROMPT_COMMAND" == *"__bp_install"* ]] || return 1
+  # Assert that before running, the command contains the install string, and
+  # afterwards it does not
+  # shellcheck disable=SC2154
+  [[ "$PROMPT_COMMAND" == *"$__bp_install_string"* ]] || return 1
 
-  eval "$PROMPT_COMMAND"
+  eval_PROMPT_COMMAND
 
-  [[ "$PROMPT_COMMAND" != *"trap DEBUG"* ]] || return 1
-  [[ "$PROMPT_COMMAND" != *"__bp_install"* ]] || return 1
+  [[ "$PROMPT_COMMAND" != *"$__bp_install_string"* ]] || return 1
 }
 
 @test "__bp_install should preserve an existing DEBUG trap" {
@@ -55,6 +91,26 @@ test_preexec_echo() {
   # note setting this causes BATS to mis-report the failure line when this test fails
   trap foo DEBUG
   [ "$(trap -p DEBUG | cut -d' ' -f3)" == "'foo'" ]
+
+  bp_install
+  trap_count_snapshot=$trap_invoked_count
+
+  [ "$(trap -p DEBUG | cut -d' ' -f3)" == "'__bp_preexec_invoke_exec" ]
+  [[ "${preexec_functions[*]}" == *"__bp_original_debug_trap"* ]] || return 1
+
+  __bp_interactive_mode # triggers the DEBUG trap
+
+  # ensure the trap count is still being incremented after the trap's been overwritten
+  (( trap_count_snapshot < trap_invoked_count ))
+}
+
+@test "__bp_install should preserve an existing DEBUG trap containing quotes" {
+  trap_invoked_count=0
+  foo() { (( trap_invoked_count += 1 )); }
+
+  # note setting this causes BATS to mis-report the failure line when this test fails
+  trap "foo && echo 'hello' >/dev/null" debug
+  [ "$(trap -p DEBUG | cut -d' ' -f3-7)" == "'foo && echo '\''hello'\'' >/dev/null'" ]
 
   bp_install
   trap_count_snapshot=$trap_invoked_count
@@ -85,7 +141,7 @@ test_preexec_echo() {
     bp_install
 
     PROMPT_COMMAND="$PROMPT_COMMAND; true"
-    eval "$PROMPT_COMMAND"
+    eval_PROMPT_COMMAND
 }
 
 @test "Appending or prepending to PROMPT_COMMAND should work after bp_install_after_session_init" {
@@ -98,7 +154,7 @@ test_preexec_echo() {
     PROMPT_COMMAND="true; $PROMPT_COMMAND"
     PROMPT_COMMAND="true; $PROMPT_COMMAND"
     PROMPT_COMMAND="true $nl $PROMPT_COMMAND"
-    eval "$PROMPT_COMMAND"
+    eval_PROMPT_COMMAND
 }
 
 # Case where a user is appending or prepending to PROMPT_COMMAND.
@@ -111,10 +167,10 @@ test_preexec_echo() {
     PROMPT_COMMAND="$PROMPT_COMMAND"$'\n echo after'
     PROMPT_COMMAND="echo after2; $PROMPT_COMMAND;"
 
-    eval "$PROMPT_COMMAND"
+    eval_PROMPT_COMMAND
 
     expected_result=$'__bp_precmd_invoke_cmd\necho after2; echo before; echo before2\n echo after\n__bp_interactive_mode'
-    [ "$PROMPT_COMMAND" == "$expected_result" ]
+    [ "$(join_PROMPT_COMMAND)" == "$expected_result" ]
 }
 
 @test "Adding to PROMPT_COMMAND after with semicolon" {
@@ -122,10 +178,10 @@ test_preexec_echo() {
     __bp_install_after_session_init
     PROMPT_COMMAND="$PROMPT_COMMAND; echo after"
 
-    eval "$PROMPT_COMMAND"
+    eval_PROMPT_COMMAND
 
     expected_result=$'__bp_precmd_invoke_cmd\necho before\n echo after\n__bp_interactive_mode'
-    [ "$PROMPT_COMMAND" == "$expected_result" ]
+    [ "$(join_PROMPT_COMMAND)" == "$expected_result" ]
 }
 
 @test "during install PROMPT_COMMAND and precmd functions should be executed each once" {
@@ -136,7 +192,7 @@ test_preexec_echo() {
     PROMPT_COMMAND="echo after2; $PROMPT_COMMAND;"
 
     precmd() { echo "inside precmd"; }
-    run eval "$PROMPT_COMMAND"
+    run eval_PROMPT_COMMAND
     [ "${lines[0]}" == "after2" ]
     [ "${lines[1]}" == "before" ]
     [ "${lines[2]}" == "before2" ]
@@ -155,7 +211,7 @@ test_preexec_echo() {
 
 @test "precmd should execute a function once" {
     precmd_functions+=(test_echo)
-    run '__bp_precmd_invoke_cmd'
+    run set_exit_code_and_run_precmd
     [ $status -eq 0 ]
     [ "$output" == "test echo" ]
 }
@@ -164,18 +220,10 @@ test_preexec_echo() {
     echo_exit_code() {
       echo "$?"
     }
-    return_exit_code() {
-      return $1
-    }
-    # Helper function is necessary because Bats' run doesn't preserve $?
-    set_exit_code_and_run_precmd() {
-      return_exit_code 251
-      __bp_precmd_invoke_cmd
-    }
 
     precmd_functions+=(echo_exit_code)
-    run 'set_exit_code_and_run_precmd'
-    [ $status -eq 0 ]
+    run set_exit_code_and_run_precmd 251
+    [ $status -eq 251 ]
     [ "$output" == "251" ]
 }
 
@@ -206,7 +254,7 @@ test_preexec_echo() {
     : "last-arg"
     __bp_preexec_invoke_exec "$_"
     eval "$bats_trap" # Restore trap
-    run '__bp_precmd_invoke_cmd'
+    run set_exit_code_and_run_precmd
     [ $status -eq 0 ]
     [ "$output" == "last-arg" ]
 }
@@ -242,7 +290,7 @@ test_preexec_echo() {
     precmd_functions+=(fun_1)
     precmd_functions+=(fun_2)
 
-    run '__bp_precmd_invoke_cmd'
+    run set_exit_code_and_run_precmd
     [ $status -eq 0 ]
     [ "${#lines[@]}" == '2' ]
     [ "${lines[0]}" == "one" ]
@@ -264,7 +312,7 @@ test_preexec_echo() {
     IFS=_
     name_with_underscores_2() { parts=(2_2); echo $parts; }
     precmd_functions+=(name_with_underscores_2)
-    run '__bp_precmd_invoke_cmd'
+    run set_exit_code_and_run_precmd
     [ $status -eq 0 ]
     [ "$output" == "2 2" ]
 }

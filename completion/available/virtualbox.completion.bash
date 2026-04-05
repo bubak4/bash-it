@@ -155,7 +155,7 @@ _vboxmanage() {
 	local cur opts
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD - 1]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
 
 	# echo "cur: |$cur|"
 	# echo "prev: |$prev|"
@@ -206,7 +206,7 @@ _vboxmanage() {
 
 	for VM in $(__vboxmanage_list_vms); do
 		if [ "$VM" == "$prev" ]; then
-			pprev=${COMP_WORDS[COMP_CWORD - 2]}
+			pprev=${COMP_WORDS[COMP_CWORD-2]}
 			# echo "previous: $pprev"
 			case $pprev in
 				startvm)

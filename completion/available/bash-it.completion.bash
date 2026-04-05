@@ -15,7 +15,7 @@ function _bash-it() {
 	local cur prev verb file_type candidates suffix
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD - 1]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
 	verb="${COMP_WORDS[1]}"
 	file_type="${COMP_WORDS[2]:-}"
 	candidates=('disable' 'enable' 'help' 'migrate' 'reload' 'restart' 'preview' 'profile' 'doctor' 'search' 'show' 'update' 'version')

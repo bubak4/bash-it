@@ -7,7 +7,7 @@ _bash-it-completion-helper-necessary notify-send || :
 _bash-it-completion-helper-sufficient notify-send || return
 
 function _notify-send() {
-	local prev="${COMP_WORDS[COMP_CWORD - 1]}"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
 
 	case $prev in
 		-u | --urgency)

@@ -118,13 +118,13 @@ function __exit_prompt() {
 }
 
 function __aws_profile_prompt() {
-	if [[ -n "${AWS_PROFILE}" ]]; then
+	if [[ -n "${AWS_PROFILE:-}" ]]; then
 		echo -n "${bold_purple?}${AWS_PROFILE_CHAR}${normal?}${AWS_PROFILE} "
 	fi
 }
 
 function __scaleway_profile_prompt() {
-	if [[ -n "${SCW_PROFILE}" ]]; then
+	if [[ -n "${SCW_PROFILE:-}" ]]; then
 		echo -n "${bold_purple?}${SCALEWAY_PROFILE_CHAR}${normal?}${SCW_PROFILE} "
 	fi
 }
@@ -189,9 +189,9 @@ function __ssh_prompt() {
 
 function __python_venv_prompt() {
 	local python_info=""
-	if [[ -n "${CONDA_DEFAULT_ENV}" ]]; then
+	if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
 		python_info="${CONDA_DEFAULT_ENV}"
-	elif [[ -n "${VIRTUAL_ENV_PROMPT}" ]]; then
+	elif [[ -n "${VIRTUAL_ENV_PROMPT:-}" ]]; then
 		python_info="${VIRTUAL_ENV_PROMPT}"
 	elif [[ -f pyproject.toml ]]; then
 		python_info=$(awk -F'"' '/^requires-python/ {print $2}' pyproject.toml)
@@ -286,7 +286,7 @@ function __ansible_prompt() {
 	# /etc/ansible/ansible.cfg
 	#
 	# Ansible will process the above list and use the first file found, all others are ignored.
-	if [ -n "$ANSIBLE_CONFIG" ]; then
+	if [ -n "${ANSIBLE_CONFIG:-}" ]; then
 		config="$ANSIBLE_CONFIG"
 	elif [ -f ansible.cfg ]; then
 		config=ansible.cfg
@@ -297,7 +297,7 @@ function __ansible_prompt() {
 		config="/etc/ansible/ansible.cfg"
 	fi
 
-	if [ -n "$config" ]; then
+	if [ -n "${config:-}" ]; then
 		echo "${bold_purple?}${ANSIBLE_CHAR}${normal?}${config} "
 	fi
 }
@@ -305,7 +305,7 @@ function __ansible_prompt() {
 function __prompt-command() {
 	exit_code="$?"
 	command_duration=$(_command_duration)
-	local wrap_char
+	local wrap_char=
 
 	# Generate prompt
 	PS1="\n "

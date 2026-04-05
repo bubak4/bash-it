@@ -7,7 +7,7 @@ _bash-it-completion-helper-necessary dmidecode || :
 _bash-it-completion-helper-sufficient dmidecode || return
 
 function _dmidecode() {
-	local prev="${COMP_WORDS[COMP_CWORD - 1]}"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
 
 	case $prev in
 		-s | --string | -t | --type)

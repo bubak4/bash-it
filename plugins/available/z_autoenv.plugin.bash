@@ -29,7 +29,7 @@ autoenv_init() {
 	_file=${#_files[@]}
 	while ((_file > 0)); do
 		#shellcheck disable=SC1090
-		source "${_files[_file - __array_offset]}"
+		source "${_files[_file-__array_offset]}"
 		: $((_file -= 1))
 	done
 }

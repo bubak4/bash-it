@@ -7,7 +7,7 @@ _bash-it-completion-helper-necessary vue || :
 _bash-it-completion-helper-sufficient vue || return
 
 function _vuejs() {
-	local prev="${COMP_WORDS[COMP_CWORD - 1]}"
+	local prev="${COMP_WORDS[COMP_CWORD-1]}"
 
 	case $prev in
 		create)

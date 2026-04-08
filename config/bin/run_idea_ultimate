@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2024-10-04 11:00:38 martin>
+# Time-stamp: <2026-04-09 00:49:14 martin>
 
 JIDEA_HOME=$HOME/.local/opt/jetbrains/idea-IU
 
@@ -11,7 +11,7 @@ export PATH
 # java virtual machine of choice
 #
 
-. ~/bin/env-jdk-temurin-21.sh
+. ~/bin/env-jdk-temurin-25.sh
 vm="$JAVA_HOME/bin/java"
 echo "I: vm=${vm}"
 

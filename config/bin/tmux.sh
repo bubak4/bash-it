@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-12-29 02:22:29 martin>
+# Time-stamp: <2026-02-24 21:16:08 martin>
 
 tmux new-session -d -s main
 
@@ -11,7 +11,7 @@ tmux new-window -n "ROOT" -t main 'su -'
 
 # logging
 which multitail && [[ -f /var/log/syslog ]] && \
-    tmux new-window -n "syslog" -t main "sudo multitail --mergeall /var/log/syslog"
+    tmux new-window -n "syslog" -t main "sudo multitail --follow-all --mergeall /var/log/syslog"
 
 # htop
 which htop && \
@@ -22,8 +22,8 @@ which htop && \
     tmux new-window -n "x11vnc" -t main 'while true ; do x11vnc -rfbport 5900 ; done'
 
 # bookworm chroot (i386)
-which schroot && [[ -f /etc/schroot/chroot.d/bookworm.conf ]] && \
-    tmux new-window -n "i386 chroot" -t main 'schroot -c bookworm'
+#which schroot && [[ -f /etc/schroot/chroot.d/bookworm.conf ]] && \
+#    tmux new-window -n "i386 chroot" -t main 'schroot -c bookworm'
 
 # attach main session with ROOT shell preselected
 tmux select-window -t main:2

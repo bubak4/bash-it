@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2023-11-12 11:15:31 martin>
+# Time-stamp: <2026-05-04 09:25:33 martin>
 
 script_name=$(basename "$0")
 
@@ -18,5 +18,7 @@ modem=$(mmcli --list-modems | perl -p -e 's/.*Modem\/(\d+) .*/\1/g')
 logger "$script_name found modem by number '$modem'"
 mmcli --modem=$modem --enable
 logger "$script_name modem by number '$modem' enabled at $device"
+
+logger "$script_name to view logs: journalctl -u ModemManager -f"
 
 tail -10 /var/log/syslog | grep -F -e "$script_name"

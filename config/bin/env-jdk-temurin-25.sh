@@ -1,7 +1,7 @@
 #!/bin/bash
-# Time-stamp: <2026-04-09 18:24:37 martin>
+# Time-stamp: <2026-04-09 18:24:43 martin>
 
-version=temurin-21
+version=temurin-25
 JAVA_HOME=$(find /usr/lib/jvm -maxdepth 1 -type d -name "*${version}*" | sort | tail -1)
 PATH=${JAVA_HOME}/bin:${JAVA_HOME}/jre/bin:$PATH
 export JAVA_HOME PATH

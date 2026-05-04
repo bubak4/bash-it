@@ -1,9 +1,9 @@
 #!/bin/bash
-# Time-stamp: <2024-09-20 21:38:27 martin>
+# Time-stamp: <2025-08-05 09:48:12 martin>
 # Customized script for opening file/directory in GNU Emacs from IntelliJ IDEA
 # but can be used from any other IDE or terminal.
 #
-# When opening directory in case it is a git repo, it will launch to magit.
+# When opening a directory if it is a git repo, it will launch to magit.
 
 filename=$1
 line_number=$2

@@ -2,6 +2,11 @@
 # shellcheck disable=SC2120,SC2207
 # A future refactor can fix this better.
 
+cite "about-completion"
+about-completion "tmux - terminal multiplexer for managing multiple shell sessions"
+group "terminal"
+url "https://github.com/tmux/tmux"
+
 # tmux completion
 # See: http://www.debian-administration.org/articles/317 for how to write more.
 # Usage: Put "source bash_completion_tmux.sh" into your .bashrc
@@ -130,12 +135,13 @@ _tmux() {
 				new-session | new)
 					case "$prev" in
 						-t) _tmux_complete_session "${cur}" ;;
+						-c) _tmux_filedir -d ;;
 						-[n | d | s]) options="-d -n -s -t --" ;;
 						*)
 							if [[ ${COMP_WORDS[option_index]} == -- ]]; then
 								_command_offset "${option_index}"
 							else
-								options="-d -n -s -t --"
+								options="-d -n -s -t -c --"
 							fi
 							;;
 					esac

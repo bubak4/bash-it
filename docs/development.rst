@@ -161,6 +161,15 @@ installing it (with pip, brew or other tools) then run ``pre-commit install`` in
 For the full use of the tool, you may need to install also other third-party tools, such as
 `shellcheck <https://github.com/koalaman/shellcheck/>`_ and `shfmt <https://github.com/mvdan/sh>`_.
 
+Update pre-commit hooks
+-----------------------
+
+Pre-commit hooks are pinned to the sha commit of the release with a 10 days cooldown.
+You can update them with `prek <https://prek.j178.dev/>`_:
+
+::
+
+    prek autoupdate --freeze --cooldown-days 10
 
 .. _linting_your_changes:
 

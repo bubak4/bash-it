@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 # shellcheck source-path=SCRIPTDIR/lib source-path=SCRIPTDIR/scripts
 # shellcheck disable=SC2034
-#
+
+# Requires bash 3.2+ to install and run
+# Skip loading if bash version is too old
+if [[ "${BASH_VERSINFO[0]-}" -lt 3 ]] || [[ "${BASH_VERSINFO[0]-}" -eq 3 && "${BASH_VERSINFO[1]}" -lt 2 ]]; then
+	echo "sorry, but the minimum version of BASH supported by bash_it is 3.2, consider upgrading?" >&2
+	return 1
+fi
+
 # Initialize Bash It
 BASH_IT_LOG_PREFIX="core: main: "
 : "${BASH_IT:=${BASH_SOURCE%/*}}"
@@ -12,8 +19,13 @@ BASH_IT_LOG_PREFIX="core: main: "
 # Load composure first, so we support function metadata
 # shellcheck source-path=SCRIPTDIR/vendor/github.com/erichs/composure
 source "${BASH_IT}/vendor/github.com/erichs/composure/composure.sh"
+
+# Extend composure with additional metadata functions
+# shellcheck disable=SC2329
+url() { :; }
+
 # support 'plumbing' metadata
-cite _about _param _example _group _author _version
+cite _about _param _example _group _author _version url
 cite about-alias about-plugin about-completion
 
 # Declare our end-of-main finishing hook, but don't use `declare`/`typeset`
@@ -22,11 +34,9 @@ _bash_it_library_finalize_hook=()
 # We need to load logging module early in order to be able to log
 source "${BASH_IT}/lib/log.bash"
 
-# libraries, but skip appearance (themes) for now
-_log_debug "Loading libraries(except appearance)..."
-APPEARANCE_LIB="${BASH_IT}/lib/appearance.bash"
+# Load libraries
+_log_debug "Loading libraries..."
 for _bash_it_main_file_lib in "${BASH_IT}/lib"/*.bash; do
-	[[ "$_bash_it_main_file_lib" == "$APPEARANCE_LIB" ]] && continue
 	_bash-it-log-prefix-by-path "${_bash_it_main_file_lib}"
 	_log_debug "Loading library file..."
 	# shellcheck disable=SC1090
@@ -55,10 +65,14 @@ if [[ -n "${BASH_IT_THEME:-}" ]]; then
 	source "${BASH_IT}/themes/base.theme.bash"
 
 	BASH_IT_LOG_PREFIX="lib: appearance: "
-	# appearance (themes) now, after all dependencies
-	# shellcheck source=SCRIPTDIR/lib/appearance.bash
-	source "$APPEARANCE_LIB"
-	BASH_IT_LOG_PREFIX="core: main: "
+	# shellcheck disable=SC1090
+	if [[ -f "${BASH_IT_THEME}" ]]; then
+		source "${BASH_IT_THEME}"
+	elif [[ -f "$CUSTOM_THEME_DIR/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash" ]]; then
+		source "$CUSTOM_THEME_DIR/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
+	elif [[ -f "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash" ]]; then
+		source "$BASH_IT/themes/$BASH_IT_THEME/$BASH_IT_THEME.theme.bash"
+	fi
 fi
 
 _log_debug "Loading custom aliases, completion, plugins..."

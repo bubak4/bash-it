@@ -1,8 +1,8 @@
 # shellcheck shell=bash
-cite about-plugin
 about-plugin 'load ble.sh, the Bash line editor!'
+url "https://github.com/akinomyoga/ble.sh"
 
-if [[ ${BLE_VERSION-} ]]; then
+if [[ -n "${BLE_VERSION-}" ]]; then
 	_log_warning "ble.sh is already loaded!"
 	return
 fi

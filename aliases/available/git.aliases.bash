@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 about-alias 'common git abbreviations'
+url "https://git-scm.com/"
 
 # We can use this variable to make sure that we don't accidentally clash with git-zsh aliases
 if _bash-it-component-item-is-enabled aliases git-omz; then
@@ -211,6 +212,12 @@ alias gt='git tag'
 alias gta='git tag -a'
 alias gtd='git tag -d'
 alias gtl='git tag -l'
+
+#worktree
+alias gw='git worktree'
+alias gwa='git worktree add'
+alias gwl='git worktree list'
+alias gwr='git worktree remove'
 
 case $OSTYPE in
 	darwin*)

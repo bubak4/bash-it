@@ -1,6 +1,8 @@
 # shellcheck shell=bash
+
 cite about-plugin
 about-plugin 'miscellaneous tools'
+url "https://github.com/Bash-it/bash-it"
 
 function ips() {
 	about 'display all ip addresses for this host'
@@ -16,10 +18,16 @@ function ips() {
 
 function down4me() {
 	about 'checks whether a website is down for you, or everybody'
-	param '1: website url'
+	param '1: website url or domain'
 	example '$ down4me http://www.google.com'
+	example '$ down4me google.com'
 	group 'base'
-	curl -Ls "http://downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g'
+	# Strip protocol (http:// or https://) if present
+	local site="${1#http://}"
+	site="${site#https://}"
+	# Strip trailing slash if present
+	site="${site%/}"
+	command curl -Ls "http://downforeveryoneorjustme.com/${site}" | command sed '/just you/!d;s/<[^>]*>//g'
 }
 
 function myip() {

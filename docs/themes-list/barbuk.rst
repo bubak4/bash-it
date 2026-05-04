@@ -32,8 +32,14 @@ available block:
 * python_venv
 * ruby
 * node
+* uv
+* bun
+* pre_commit
 * terraform
 * cloud
+* mysql
+* docker
+* ansible
 * duration
 * exit
 
@@ -54,20 +60,28 @@ Default theme glyphs
    BARBUK_GITLAB_CHAR='  '
    BARBUK_BITBUCKET_CHAR='  '
    BARBUK_GITHUB_CHAR='  '
-   BARBUK_GIT_DEFAULT_CHAR='  '
+   BARBUK_ARCHLINUX_CHAR:='  '
+   BARBUK_CODEBERG_CHAR:='  '
+   BARBUK_GIT_DEFAULT_CHAR='  '
    BARBUK_GIT_BRANCH_ICON=''
    BARBUK_CURRENT_USER_PREFFIX='  '
    BARBUK_HG_CHAR='☿ '
    BARBUK_SVN_CHAR='⑆ '
    BARBUK_EXIT_CODE_ICON=' '
    BARBUK_PYTHON_VENV_CHAR=' '
+   BARBUK_UV_CHAR:='🐍'
    BARBUK_COMMAND_DURATION_ICON='  '
    BARBUK_RUBY_CHAR=' '
    BARBUK_NODE_CHAR=' '
+   BARBUK_BUN_CHAR:='🍞 '
    BARBUK_TERRAFORM_CHAR="❲t❳ "
    BARBUK_AWS_PROFILE_CHAR=" aws "
    BARBUK_SCALEWAY_PROFILE_CHAR=" scw "
    BARBUK_GCLOUD_CHAR=" gcp "
+   BARBUK_DOCKER_CHAR:=" "
+   BARBUK_MYSQL_CHAR:=" "
+   BARBUK_MARIADB_CHAR:=" "
+   BARBUK_ANSIBLE_CHAR:=" "
 
 Customize glyphs
 ^^^^^^^^^^^^^^^^
@@ -156,7 +170,7 @@ Python venv
 
 .. code-block:: bash
 
-     flask ~/test on  master ✓ ❯
+     flask ~/test on  master ✓ ❯
 
 Command duration
 ^^^^^^^^^^^^^^^^

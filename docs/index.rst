@@ -17,6 +17,7 @@ Stop polluting your ``~/bin`` directory and your ``.bashrc`` file, fork/clone Ba
    contributing
    development
    test
+   ci
    installation
    commands/index
    custom

@@ -1,15 +1,17 @@
 # shellcheck shell=bash
-#
+
+cite "about-completion"
+about-completion "svn - Apache Subversion version control system"
+group "version-control"
+url "https://subversion.apache.org/"
+
 # Locate and load completions for `svn`.
 
 # Make sure svn is installed
-_command_exists svn || return
+_bash-it-completion-helper-necessary svn || :
 
 # Don't handle completion if it's already managed
-if _completion_exists svn; then
-	_log_warning "completion already loaded - this usually means it is safe to stop using this completion"
-	return 0
-fi
+_bash-it-completion-helper-sufficient svn || return
 
 _svn_bash_completion_xcrun_svn=
 if _command_exists xcrun; then

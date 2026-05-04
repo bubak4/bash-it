@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-10-11 12:59:06 martin>
+# Time-stamp: <2026-04-27 21:48:21 martin>
 # gitw -- git wrapper for multiple repositories
 
 # SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
@@ -25,6 +25,7 @@ function usage() {
     echo "branch-create <branch>   ... create a new branch in all repos based on current branch"
     echo "branch-delete <branch>   ... delete a branch in all repos (both local and remote)"
     echo "branch-list              ... list all branches in all repos"
+    echo "branch-sync              ... sync all branches in all repos (prune local stale references)"
     echo "<git-command>            ... any git command, e.g. status, pull, checkout, commit, push, merge, etc."
     echo
     echo "Environment variables:"
@@ -250,6 +251,10 @@ function branch_list() {
     run_command --no-pager branch --remotes --all --verbose
 }
 
+function branch_sync() {
+    run_command --no-pager fetch --all --prune --tags --verbose
+}
+
 ########
 # main #
 ########
@@ -275,6 +280,8 @@ elif test "$1" = "branch-delete" ; then
     branch_delete "$2"
 elif test "$1" = "branch-list" ; then
     branch_list
+elif test "$1" = "branch-sync" ; then
+    branch_sync
 elif test "$1" = "repos-list" ; then
     echo "Using config: $cfg"
     echo "$REPOS"

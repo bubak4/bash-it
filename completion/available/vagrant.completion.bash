@@ -56,7 +56,7 @@ __vagrantinvestigate() {
 
 _vagrant() {
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	prev="${COMP_WORDS[COMP_CWORD - 1]}"
 	commands="box cloud destroy global-status halt help hostmanager init login package plugin port powershell provision push rdp reload resume scp snapshot ssh ssh-config status suspend up upload validate vbguest version winrm winrm-config"
 
 	if ((COMP_CWORD == 1)); then
@@ -123,7 +123,7 @@ _vagrant() {
 	fi
 
 	if ((COMP_CWORD == 3)); then
-		action="${COMP_WORDS[COMP_CWORD-2]}"
+		action="${COMP_WORDS[COMP_CWORD - 2]}"
 		case "$action" in
 			"up")
 				if [ "$prev" == "--no-provision" ]; then
@@ -155,8 +155,8 @@ _vagrant() {
 	fi
 
 	if ((COMP_CWORD == 4)); then
-		action="${COMP_WORDS[COMP_CWORD-3]}"
-		prev="${COMP_WORDS[COMP_CWORD-2]}"
+		action="${COMP_WORDS[COMP_CWORD - 3]}"
+		prev="${COMP_WORDS[COMP_CWORD - 2]}"
 		case "$action" in
 			"snapshot")
 				if [ "$prev" == "restore" ]; then

@@ -85,7 +85,7 @@ __docker_compose_map_key_of_current_option() {
 		key=${cur%=*}
 		glob_pos=$((cword - 1))
 	elif [ "$prev" = "=" ]; then
-		key=${words[$cword-2]} # key=value case
+		key=${words[$cword - 2]} # key=value case
 		glob_pos=$((cword - 3))
 	else
 		return

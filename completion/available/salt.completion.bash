@@ -49,12 +49,12 @@ _salt() {
 	local cur prev opts _salt_grains _salt_coms pprev ppprev
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	prev="${COMP_WORDS[COMP_CWORD - 1]}"
 	if [ "${COMP_CWORD}" -gt 2 ]; then
-		pprev="${COMP_WORDS[COMP_CWORD-2]}"
+		pprev="${COMP_WORDS[COMP_CWORD - 2]}"
 	fi
 	if [ "${COMP_CWORD}" -gt 3 ]; then
-		ppprev="${COMP_WORDS[COMP_CWORD-3]}"
+		ppprev="${COMP_WORDS[COMP_CWORD - 3]}"
 	fi
 
 	opts="-h --help -d --doc --documentation --version --versions-report -c \
@@ -145,7 +145,7 @@ _saltkey() {
 	local cur prev opts prev pprev
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	prev="${COMP_WORDS[COMP_CWORD - 1]}"
 	opts="-c --config-dir= -h --help --version --versions-report -q --quiet \
           -y --yes --gen-keys= --gen-keys-dir= --keysize= --key-logfile= \
           -l --list= -L --list-all -a --accept= -A --accept-all \
@@ -154,10 +154,10 @@ _saltkey() {
           --out=pprint --out=yaml --out=overstatestage --out=json --out=raw \
           --out=highstate --out=key --out=txt --no-color --out-indent= "
 	if [ "${COMP_CWORD}" -gt 2 ]; then
-		pprev="${COMP_WORDS[COMP_CWORD-2]}"
+		pprev="${COMP_WORDS[COMP_CWORD - 2]}"
 	fi
 	if [ "${COMP_CWORD}" -gt 3 ]; then
-		ppprev="${COMP_WORDS[COMP_CWORD-3]}"
+		ppprev="${COMP_WORDS[COMP_CWORD - 3]}"
 	fi
 	if [[ "${cur}" == -* ]]; then
 		COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
@@ -232,16 +232,16 @@ _saltcall() {
 	local cur prev opts _salt_coms pprev ppprev
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	prev="${COMP_WORDS[COMP_CWORD - 1]}"
 	opts="-h --help -d --doc --documentation --version --versions-report \
           -m --module-dirs= -g --grains --return= --local -c --config-dir= -l --log-level= \
           --out=pprint --out=yaml --out=overstatestage --out=json --out=raw \
           --out=highstate --out=key --out=txt --no-color --out-indent= "
 	if [ "${COMP_CWORD}" -gt 2 ]; then
-		pprev="${COMP_WORDS[COMP_CWORD-2]}"
+		pprev="${COMP_WORDS[COMP_CWORD - 2]}"
 	fi
 	if [ "${COMP_CWORD}" -gt 3 ]; then
-		ppprev="${COMP_WORDS[COMP_CWORD-3]}"
+		ppprev="${COMP_WORDS[COMP_CWORD - 3]}"
 	fi
 	if [[ "${cur}" == -* ]]; then
 		COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
@@ -284,7 +284,7 @@ _saltcp() {
 	local cur prev opts prefpart helper filt pprev ppprev
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	prev="${COMP_WORDS[COMP_CWORD - 1]}"
 	opts="-t --timeout= -s --static -b --batch= --batch-size= \
           -h --help --version --versions-report -c --config-dir= \
           -E --pcre -L --list -G --grain --grain-pcre -N --nodegroup \

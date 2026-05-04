@@ -11,7 +11,7 @@ __kitchen_instance_list() {
 
 __kitchen_options() {
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	prev="${COMP_WORDS[COMP_CWORD - 1]}"
 	COMPREPLY=()
 
 	case $prev in

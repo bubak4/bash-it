@@ -66,7 +66,7 @@ _tmux() {
 	local i cmd cmd_index option option_index
 	COMPREPLY=()
 	cur="${COMP_WORDS[COMP_CWORD]}"
-	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	prev="${COMP_WORDS[COMP_CWORD - 1]}"
 
 	if [[ "${prev}" == -f ]]; then
 		_tmux_filedir

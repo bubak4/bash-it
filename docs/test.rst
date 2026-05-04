@@ -9,7 +9,7 @@ Overview
 The Bash-it unit tests leverage the `Bats unit test framework for Bash <https://github.com/bats-core/bats-core>`_.
 There is no need to install Bats explicitly, the test run script will automatically download and install Bats and its dependencies.
 
-When making changes to Bash-it, the tests are automatically executed in a test build environment on `Travis CI <https://travis-ci.com>`_.
+When making changes to Bash-it, the tests are automatically executed in a test build environment on `GitHub Actions <https://github.com/Bash-it/bash-it/actions>`_. See the :ref:`Continuous Integration <ci>` section for more details.
 
 Test Execution
 --------------

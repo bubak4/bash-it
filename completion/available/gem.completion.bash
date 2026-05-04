@@ -6,7 +6,7 @@ url "https://rubygems.org/"
 
 __gem_completion() {
 	local cur=${COMP_WORDS[COMP_CWORD]}
-	local prev=${COMP_WORDS[COMP_CWORD-1]}
+	local prev=${COMP_WORDS[COMP_CWORD - 1]}
 	case $prev in
 		install)
 			# list the remote gems and add to completion

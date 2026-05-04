@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: < rsync-backup.sh (2018-07-10 13:12) >
+# Time-stamp: <2026-04-29 12:29:32 martin>
 
 # find 'backup' mount point
 backup_mount_point=`lsblk  -o mountpoint,label | fgrep -e backup | cut -f 1 -d " "`
@@ -38,6 +38,8 @@ rsync --archive --verbose --progress --update --delete /etc $target_dir/
 rsync --archive --verbose --progress --update --delete \
       --exclude '/home/basex/isrep/basex/data' \
       --exclude '/home/basex/isrep/basex/source-xml' \
+      --exclude '/home/martin/volumes' \
+      --exclude '/home/martin/.m2/repository' \
       --exclude '/home/martin/src/dain/ispop/var/oracle/dump' \
       --exclude '/home/oracle/install' \
       /home $target_dir/

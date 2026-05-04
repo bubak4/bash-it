@@ -1,6 +1,12 @@
 export GITLAB_URI=https://gitlab.livesystems.cz
 export GITLAB_TOKEN=glpat-BhjKp9EDS-HvYdsZbZ1x
 
+# source the completion for op (OpenPlatform management command)
+OP_COMPLETION=~/src/livesystems/openplatform/openplatform-orchestration/op-completion.bash
+if test -f "$OP_COMPLETION" ; then
+    source "$OP_COMPLETION"
+fi
+
 function ls-git-repo-setup()
 {
     git config user.name "martin.slouf"

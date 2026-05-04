@@ -1,14 +1,17 @@
 #!/bin/bash
-# Time-stamp: <2025-11-22 08:59:11 martin>
+# Time-stamp: <2026-04-28 23:46:44 martin>
 
 session="LS"
 
 declare -A TARGET_DIRS
 TARGET_DIRS["op"]="$HOME/src/livesystems/openplatform/openplatform-orchestration"
+TARGET_DIRS["op-AI"]="$HOME/src/livesystems/openplatform"
 TARGET_DIRS["cy"]="$HOME/src/livesystems/cysensic/cysensic-orchestration"
+TARGET_DIRS["cy-AI"]="$HOME/src/livesystems/cysensic"
 TARGET_DIRS["spvs"]="$HOME/src/livesystems/spvs/openassets-orchestration"
 TARGET_DIRS["lkp"]="$HOME/src/livesystems/lkp/lkp-orchestration"
 TARGET_DIRS["oa"]="$HOME/src/livesystems/openassets/openassets-orchestration"
+TARGET_DIRS["ppas"]="$HOME/src/livesystems/ppas/ppas-orchestration"
 
 tmux new-session -d -s "$session"
 

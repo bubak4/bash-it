@@ -138,7 +138,6 @@ mode "resize" {
 
 bindsym $mod+m exec "emacsclient --create-frame --frame-parameters='((fullscreen . maximized))'"
 bindsym $mod+n exec "zenity --text-info --editable --font 'Andika 11' --title 'Sticky note'"
-bindsym $mod+Shift+n exec ~/bin/run_mc
 bindsym $mod+l exec i3lock-fancy -f Andika
 
 # desktop notifications (code 34 == [, code 35 == ])

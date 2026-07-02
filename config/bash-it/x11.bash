@@ -285,7 +285,7 @@ function x-display()
     local external= # last external device is used as default
     # x230 -> LVDS*, x390 -> eDP*
     echo $all | fgrep -e LVDS >/dev/null && internal=LVDS
-    echo $all | fgrep -e eDP >/dev/null && internal=eDP    
+    echo $all | fgrep -e eDP >/dev/null && internal=eDP
     for i in $all ; do
          if [[ $i == ${internal}* ]] ; then # startswith
             internal=$i
@@ -324,6 +324,11 @@ function x-display()
         external_mode=$(cat $tmp | egrep -e "^$external " -A 1 | fgrep -v -e $external | perl -pe 's/(\s+)((\d+)x(\d+))(.*)/\2/g')
     fi
 
+    # choose the smaller resolution -- important for --scale-from when extending -- you do not want to scale from bigger to smaller
+    # (scaling from smaller to smaller is no sclaing at all -- which is ok -- will use the resolution of the target)
+    # split on x, multiply the two halves to get area, tack the original string on, then sort all lines by area and grab the first (smallest)
+    smallest_mode=$(printf '%s\n' $internal_mode $external_mode | awk -Fx '{print $1*$2, $0}' | sort -n | head -1 | cut -d' ' -f2)
+
     echo "I: all                         = $all"
     echo "I: internal                    = $internal"
     echo "I: internal_mode               = $internal_mode"
@@ -334,6 +339,7 @@ function x-display()
     echo "I: external_dpi                = $external_dpi"
     echo "I: requested_mode              = $requested_mode"
     echo "I: requested_dpi               = $requested_dpi"
+    echo "I: smallest_mode               = $smallest_mode"
     echo "I: action                      = $action"
     echo "I: extend                      = $extend_placement"
     echo "I: DPI                         = $DPI"
@@ -389,7 +395,7 @@ function x-display()
             --auto \
             --mode $external_mode \
             $extend_placement $internal \
-            --scale-from $internal_mode \
+            --scale-from $smallest_mode \
             --dpi $external_dpi
     elif test "$action" = "off" ; then
         # check for disconnected external and fix them

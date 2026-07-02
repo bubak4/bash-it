@@ -14,5 +14,8 @@ if which seq > /dev/null; then
         alias mcd$i="pwd > $DIRCLIP/dirclip$i"
         alias rcd$i='cd $(cat $DIRCLIP/dirclip'"$i"'); pwd'
     done
+    # legacy
     alias cds='for i in " " `seq 1 9` "0"; do if [ -e $DIRCLIP/dirclip$i ]; then echo -n "$i "; cat $DIRCLIP/dirclip$i | sed "s:^$HOME:~:"; else echo ""; fi; done'
+    # new (l -- list)
+    alias cdl='for i in " " `seq 1 9` "0"; do if [ -e $DIRCLIP/dirclip$i ]; then echo -n "$i "; cat $DIRCLIP/dirclip$i | sed "s:^$HOME:~:"; else echo ""; fi; done'
 fi

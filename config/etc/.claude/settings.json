@@ -113,6 +113,6 @@
     "typescript-lsp@claude-plugins-official": true
   },
   "tui": "default",
-  "defaultMode": "plan",
-  "skipWorkflowUsageWarning": true
+  "skipWorkflowUsageWarning": true,
+  "defaultMode": "plan"
 }

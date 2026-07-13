@@ -1,0 +1,2136 @@
+# Time-stamp: <2026-05-06 23:20:25 martin>
+#+TITLE: Martin's Doom Emacs configuration
+#+AUTHOR: martin@slouf.name
+#+OPTIONS: ^:nil
+#+LANGUAGE: en
+#+STARTUP: showeverything
+
+* Contents :toc:
+- [[#intro][Intro]]
+  - [[#external-tools][External tools]]
+- [[#how-to][How-to]]
+  - [[#help][Help]]
+  - [[#installing-my-emacs-environment][Installing my Emacs environment]]
+  - [[#built-in-features-worth-knowing][Built-in features worth knowing]]
+  - [[#text-navigation-and-editing][Text navigation and editing]]
+  - [[#code-navigation-cheat-sheet][Code navigation cheat-sheet]]
+- [[#core][Core]]
+  - [[#doom-emacs][Doom Emacs]]
+  - [[#gnu-emacs][GNU Emacs]]
+  - [[#utility-functions][Utility functions]]
+  - [[#keymaps][Keymaps]]
+- [[#abbrev][Abbrev]]
+  - [[#skeletons][skeletons]]
+  - [[#abbrev-1][abbrev]]
+- [[#bookmarks][Bookmarks]]
+- [[#claude-code][Claude Code]]
+- [[#company][Company]]
+- [[#consult][Consult]]
+- [[#copilot][Copilot]]
+- [[#dired-sidebar][Dired-sidebar]]
+- [[#direx][Direx]]
+- [[#ediff][Ediff]]
+- [[#highlight-symbol][Highlight-symbol]]
+- [[#ibuffer][IBuffer]]
+- [[#ispell][ISpell]]
+- [[#magit][Magit]]
+- [[#multiple-cursors][Multiple Cursors]]
+- [[#notmuch][Notmuch]]
+  - [[#reading][Reading]]
+  - [[#composing-message-mode][Composing (=message-mode=)]]
+- [[#org][Org]]
+  - [[#structure-editing][Structure editing]]
+  - [[#folding--navigation][Folding & navigation]]
+  - [[#editing-inside-a-heading][Editing inside a heading]]
+  - [[#export][Export]]
+  - [[#markup-quick-reference][Markup quick-reference]]
+  - [[#tables][Tables]]
+- [[#plantuml][Plantuml]]
+- [[#project][Project]]
+  - [[#why-a-custom-finder-and-not-just-project-vc-extra-root-markers][Why a custom finder (and not just =project-vc-extra-root-markers=)]]
+  - [[#implementation][Implementation]]
+- [[#projectile][Projectile]]
+- [[#python][Python]]
+  - [[#auto-activate-project-local-venv][Auto-activate project-local =.venv=]]
+  - [[#repl][REPL]]
+  - [[#diagnostics-flymake][Diagnostics (Flymake)]]
+  - [[#debugging][Debugging]]
+- [[#tramp][Tramp]]
+- [[#treemacs][Treemacs]]
+- [[#uniquify][Uniquify]]
+- [[#vterm][Vterm]]
+- [[#wgrep][Wgrep]]
+- [[#whitespace][Whitespace]]
+  - [[#why-the-previous-setup-stopped-working][Why the previous setup stopped working]]
+  - [[#setup][Setup]]
+
+* Intro
+
+Doom Emacs custom configuration file.
+
+** External tools
+
+Doom and the configuration below rely on a set of system tools.
+Install them up-front so nothing fails silently at runtime.
+
+*** Required system packages (apt)
+
+#+BEGIN_SRC sh
+# Core: VCS, project search, fast find
+apt -y install git ripgrep fd-find
+
+# Spell-checking (English + Czech)
+apt -y install aspell aspell-en aspell-cs
+
+# vterm terminal emulator — built from source by Doom on first start
+apt -y install cmake libtool-bin libvterm-dev
+
+# Email
+apt -y install notmuch
+
+# Diagrams
+apt -y install plantuml
+
+# Used by the XML / JSON pretty-format helpers in Utility functions
+apt -y install libxml2-utils jq
+
+# Python
+apt -y install ipython3 python3-pip python3-venv
+
+# Node.js — needed for Copilot, Claude Code, and the Pyright / TS LSP servers
+apt -y install nodejs npm
+
+# Language servers
+apt -y install clangd                  # C / C++ LSP (used by `(cc +lsp)`)
+# Java LSP (jdtls) is auto-downloaded by lsp-java on first use; needs JDK:
+apt -y install default-jdk
+
+# Optional: external diff/merge tool (used outside Emacs and as git mergetool)
+apt -y install meld
+#+END_SRC
+
+*** Required npm globals
+
+#+BEGIN_SRC sh
+# Pyright — language server used by `(python +lsp)` via Eglot
+npm install -g pyright
+
+# TypeScript / JavaScript language server (used by `(javascript +lsp)`)
+npm install -g typescript typescript-language-server
+
+# Claude Code CLI — bridge for `claude-code-ide.el`
+npm install -g @anthropic-ai/claude-code
+#+END_SRC
+
+*** One-off Emacs commands after install
+
+- =M-x copilot-install-server= — installs the Copilot language server
+- =M-x nerd-icons-install-fonts= — installs the icon font (for treemacs / modeline)
+
+* How-to
+
+** Help
+
+| =C-h f= | =describe-function= |                                              |
+| =C-h v= | =describe-variable= |                                              |
+| =C-h k= | =describe-key=      |                                              |
+| =C-h w= | =where-is=          | show the keybinding(s) attached to a command |
+| =C-h a= | =command-apropos=   | search commands by substring                 |
+
+** Installing my Emacs environment
+
+1. Build and install the latest stable Emacs (see [[https://www.emacswiki.org/emacs/EmacsSnapshotAndDebian][EmacsSnapshotAndDebian]] for
+   notes on Debian/Ubuntu).
+2. Pull =linuxconf= and symlink =~/.emacs.d= into the right place.
+3. Start GNU/Emacs — see =~/.bashrc=: =$EDITOR= and the =emacs-start= alias.
+4. Optional Debian packages: =emacs emacs-goodies-el emacs-intl-fonts=.
+
+*** Building Emacs from source
+
+Build dependencies — versions below are what worked for Emacs 28; bump
+=libgccjit-10-dev= / =gcc-10= to match the toolchain on a newer
+Debian/Ubuntu.
+
+#+BEGIN_SRC sh
+aptitude -y install \
+  autoconf automake libtool libtool-bin texinfo build-essential \
+  libncurses5-dev libgpm-dev \
+  libdbus-1-dev libxml2-dev libgnutls28-dev \
+  xorg-dev libgtk-3-dev libcairo2-dev libgconf2-dev \
+  libotf-dev libjpeg-dev libgif-dev libtiff-dev libm17n-dev libpng-dev librsvg2-dev libxpm-dev \
+  libgccjit0 libgccjit-10-dev \
+  libjansson4 libjansson-dev \
+  gcc-10 g++-10
+#+END_SRC
+
+Build a specific tag (kept here as a reference recipe — replace =emacs-28.2=
+with whatever release you want):
+
+#+BEGIN_SRC sh
+cd /home/martin/src/oss/emacs
+git checkout master && git pull
+git checkout emacs-28.2          # checkout desired version
+git clean -dxf                   # clean up old build artefacts
+./autogen.sh
+./configure --prefix=/home/martin/.local/opt/emacs-28.2 \
+            --with-modules --with-pgtk --with-native-compilation --with-json
+cpu_count=$(grep -c '^processor' /proc/cpuinfo)
+make -j "$cpu_count" bootstrap
+make install
+#+END_SRC
+
+** Built-in features worth knowing
+
+(=Abbrev=, =bookmark=, and =Tramp= are documented in their own
+top-level sections; this one collects the remaining built-ins that
+don't have a dedicated config block.)
+
+*** Registers
+
+A register is a single-character slot that holds a position, region,
+window configuration, or other value.  Pick any character =<c>= for
+each binding below.
+
+| =C-x r SPC <c>= | =point-to-register=                | save the current position into register =<c>=                                             |
+| =C-x r j <c>=   | =jump-to-register=                 | jump back to the saved position                                                           |
+| =C-x r s <c>=   | =copy-to-register=                 | save the region into the register                                                         |
+| =C-x r i <c>=   | =insert-register=                  | insert the saved text                                                                     |
+| =C-x r w <c>=   | =window-configuration-to-register= | save the current window layout — useful for restoring frames later via =jump-to-register= |
+|                 | =view-register=                    | show what a register currently holds                                                      |
+
+*** Calendar
+
+|         | =M-x calendar=                  | open the calendar; LaTeX export commands are listed below |
+| =t y=   | =cal-tex-cursor-year=           | one-year calendar                                         |
+| =t Y=   | =cal-tex-cursor-year-landscape= | one-year calendar in landscape                            |
+| =t f y= | =cal-tex-cursor-filofax-year=   | Filofax-style one-year calendar                           |
+
+*** Dired (file management)
+
+| =C-x d= | =dired=                        | open a directory listing (like =C-x C-f= but for directories) |
+| =g=     | =revert-buffer=                | refresh the listing                                           |
+| =o=     | =dired-find-file-other-window= | open the file at point in the other window                    |
+| =m=     | =dired-mark=                   | mark the file at point for later batch operations             |
+| =!=     | =dired-do-shell-command=       | run a shell command on the marked files                       |
+| =s=     | =dired-sort-toggle-or-edit=    | toggle sort order (date vs. name)                             |
+| =i=     | =dired-maybe-insert-subdir=    | inline-expand a subdirectory in the same buffer               |
+| =l=     | =dired-do-redisplay=           | re-read the directory                                         |
+| =$=     | =dired-hide-subdir=            | hide a subdirectory section                                   |
+
+*** Buffer (en)coding
+
+|   | =set-buffer-file-coding-system= | change the coding system used to write the current buffer |
+
+*** Profiling Emacs Lisp
+
+| =M-x profiler-start=  | start CPU/memory sampling |
+| =M-x profiler-report= | open the results report   |
+| =M-x profiler-stop=   | stop sampling             |
+
+*** Proced
+
+=M-x proced= — built-in interface to system processes (like =htop=
+inside Emacs).
+
+*** Font size
+
+| | =menu-set-font= | open the X font dialog and apply the chosen font to the current frame |
+
+** Text navigation and editing
+
+Emacs treats text as a hierarchy: characters → words → sentences →
+paragraphs → buffer.  The boundaries of each unit are governed by
+major-mode-specific variables (=paragraph-start=, =sentence-end=,
+the syntax table) so the same key behaves sensibly in code, prose,
+and markup.
+
+*** Buffers, scrolling, line layout
+
+| =C-x o= | =other-window=        | jump to the next visible window                                    |
+| =M->=   |                       | end of buffer                                                      |
+| =M-<=   |                       | beginning of buffer                                                |
+| =C-l=   | =recenter-top-bottom= | recenter the screen on the current line (cycles top/middle/bottom) |
+| =C-v=   |                       | page down                                                          |
+| =M-v=   |                       | page up                                                            |
+
+*** Inserting and reformatting
+
+| =C-q= | =quoted-insert=  | insert a literal character without interpretation (e.g. =^L=, form feed) |
+| =M-q= | =fill-paragraph= | re-flow the current paragraph to =fill-column=                           |
+| =M-s= | =center-line=    | center the current line                                                  |
+
+*** Characters
+
+| =C-f= | =forward-char=    |                               |
+| =C-b= | =backward-char=   |                               |
+| =C-d= | =delete-char=     | delete the character at point |
+| =C-t= | =transpose-chars= | swap adjacent characters      |
+
+*** Words
+
+| =M-f= | =forward-word=    |                     |
+| =M-b= | =backward-word=   |                     |
+| =M-@= | =mark-word=       | mark the next word  |
+| =M-d= | =kill-word=       | kill the next word  |
+| =M-t= | =transpose-words= | swap adjacent words |
+
+*** Paragraphs
+
+| =M-{= | =backward-paragraph= |                                |
+| =M-}= | =forward-paragraph=  |                                |
+| =M-h= | =mark-paragraph=     | mark the surrounding paragraph |
+
+*** Balanced expressions and defuns
+
+| =C-M-f=   | =forward-sexp=       | move over a balanced expression — e.g. a =( ... )= or =\{ ... \}= block |
+| =C-M-b=   | =backward-sexp=      | move back over one                                                      |
+| =C-M-k=   | =kill-sexp=          | kill the next balanced expression                                       |
+| =C-M-SPC= | =mark-sexp=          | mark the next balanced expression                                       |
+| =C-M-a=   | =beginning-of-defun= | go to start of the current function                                     |
+| =C-M-e=   | =end-of-defun=       | go to end of the current function                                       |
+| =C-M-h=   | =mark-defun=         | mark the whole function                                                 |
+
+*** Region, kill-ring, rectangles
+
+| =C-SPC=   | =set-mark-command= | start a region                                              |
+| =C-x r k= | =kill-rectangle=   | kill the rectangle defined by point and mark                |
+| =C-x r y= | =yank-rectangle=   | yank the most recent killed rectangle                       |
+|           | =browse-kill-ring= | browse the history of kills (package; pick one and re-yank) |
+
+*** Case
+
+| =M-l=     | =downcase-word=   |
+| =M-u=     | =upcase-word=     |
+| =C-x C-l= | =downcase-region= |
+| =C-x C-u= | =upcase-region=   |
+
+*** Indentation
+
+| =TAB=     | =indent-for-tab-command= | re-indent the current line per major-mode rules           |
+| =C-x TAB= | =indent-rigidly=         | shift the marked region by N columns; arrow keys nudge it |
+
+
+*** Built-in editing helpers
+
+**** =shell-command-on-region= (=M-|=)
+
+Pipes the region through a shell command.  With a numeric prefix
+argument, the output *replaces* the region; without, it goes into a
+temp buffer.  Convenient for in-place reformatting:
+
+1. mark the region
+2. =C-1 M-| xmllint --format -=    (the =C-1= prefix triggers replace)
+
+**** =highlight-symbol-query-replace=
+
+Replaces every occurrence of the symbol highlighted by
+=highlight-symbol-mode= with a user-supplied replacement.
+
+**** =M-x re-builder=
+
+Build a regexp interactively in a small buffer; matches are
+highlighted live in the source buffer.  Aliased to =M-x regexp-builder=.
+
+| =C-c C-w= | =reb-copy= | copy the current regexp to the kill-ring (handy for pasting into =C-M-%=) |
+
+**** Regexp replace (=C-M-%=)
+
+=query-replace-regexp= — interactive search-and-replace using a regex,
+with =y/n/!/...= prompting for each match.
+
+**** =rgrep= and =lgrep=
+
+| =M-x rgrep= | recursive grep across files                                   |
+| =M-x lgrep= | non-recursive (single directory); shares history with =rgrep= |
+
+Both prompt for a pattern (defaulting to the symbol at point), a file
+mask (defaulting to the current buffer's extension), and a top
+directory.  They honour =grep-find-ignored-directories= and
+=grep-find-ignored-files=.
+
+For project-wide searches, =M-x consult-ripgrep= (=f5 r=) is usually
+faster and integrates with the project root.
+
+** Code navigation cheat-sheet
+
+Reference for moving around source with the current setup
+(=vertico= + =consult= + =eglot= + =projectile= + =better-jumper=).
+Most commands are reachable via =M-x=; the highlighted ones are bound
+directly under the [[#keymaps][Keymaps]] section.
+
+*** Within the current file
+
+- =M-x consult-imenu= — fuzzy-pick a symbol (function, class, heading)
+- =M-x consult-line= (also bound to =f5 s= and =C-<f12>=) — fuzzy-pick a line
+- =C-M-a= / =C-M-e= — beginning / end of defun
+- =C-M-f= / =C-M-b= — sexp forward / back
+- =C-M-h= — mark whole defun
+
+*** Across the project — by file
+
+- =M-x projectile-find-file= — file in current project
+- =M-x consult-buffer= (default =C-x b=) — buffers + recent files + bookmarks
+- =M-x consult-recent-file= — recents only
+
+*** Across the project — by symbol
+
+- =M-G= — =consult-eglot-symbols=, workspace-wide LSP symbol search
+- =M-x consult-imenu-multi= — imenu across all open buffers
+- =f5 r= — =consult-ripgrep=, project text search
+- =C-M-.= — =xref-find-apropos=, symbols matching a pattern (non-LSP fallback)
+
+*** Definitions, references, types (LSP via Eglot)
+
+- =M-.= — find definition
+- =M-,= — pop back to where you came from (xref's own back-stack)
+- =M-?= — find references / callers
+- =f5 .= — =eglot-find-typeDefinition= (analogue of =M-.= for the *type*)
+- =M-x eglot-find-implementation= — interface → concrete implementation
+- =M-x eglot-rename= — workspace-wide rename
+
+*** Position history (orthogonal to xref)
+
+- =C-M-<left>= / =C-M-<right>= — better-jumper backward / forward
+- =f5 j= — =better-jumper-set-jump= (drop a marker at point)
+- =M-x consult-mark= — recent marks in current buffer
+- =M-x consult-global-mark= — marks across all buffers
+
+*** Errors / diagnostics
+
+- =M-g M-n= / =M-g M-p= — next / previous error
+- =M-x consult-flymake= — pick from current buffer diagnostics
+
+
+* Core
+
+** Doom Emacs
+
+#+BEGIN_SRC emacs-lisp
+(setq
+ doom-font (font-spec :family "Anonymous Pro" :size 12.0)
+ doom-big-font (font-spec :family "Anonymous Pro" :size 18.0)
+ doom-variable-pitch-font (font-spec :family "Andika" :size 12.0))
+(custom-set-faces!
+  '(font-lock-comment-face :slant italic))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(after! doom-themes
+  (setq doom-themes-treemacs-enable-variable-pitch nil
+        doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-treemacs-config))
+;; NOTE: doom-themes-org-config is already wired up by Doom's :ui doom module
+;; (via the doom-load-theme hook), so it is intentionally not called here.
+#+END_SRC
+
+** GNU Emacs
+
+#+BEGIN_SRC emacs-lisp
+(scroll-bar-mode -1)            ;; no scroll bar
+(menu-bar-mode -1)              ;; no menu bar
+(tool-bar-mode -1)              ;; no tool bar
+(display-time-mode -1)          ;; do not show time
+(global-visual-line-mode -1)    ;; no soft wrap
+(global-subword-mode 1)         ;; iterate through CamelCase
+(global-so-long-mode 1)         ;; avoid performance issues for long lines (since Emacs 27)
+(glasses-mode -1)               ;; disable glasses-mode to show text as is
+;;(setq! glasses-separator "")
+;;(setq! glasses-face 'bold)
+
+(defvar my-default-fill-column 120)
+
+(setq
+ truncate-lines t               ;; do not truncate lines
+ auto-save-default t            ;; auto-saving on every visiting file
+ make-backup-files t            ;; make backup files
+ confirm-kill-emacs nil         ;; do not confirm exiting emacs
+ display-line-numbers-type nil  ;; disable line numbers
+ fill-column my-default-fill-column)
+
+(add-to-list 'vc-directory-exclusion-list '".venv" t)
+(add-to-list 'vc-directory-exclusion-list '".idea" t)
+(setq grep-find-ignored-directories vc-directory-exclusion-list)
+
+(add-hook 'before-save-hook 'time-stamp) ;; Time-stamp: <> hook
+#+END_SRC
+
+** Utility functions
+
+*** Create a buffer that contains primary X selection.
+
+#+BEGIN_SRC emacs-lisp
+(setq my/create-selection-buffer-counter 0)
+
+(defun my/create-selection-buffer()
+    "Creates a buffer that contains primary X selection."
+    (interactive)
+    (setq my/create-selection-buffer-counter
+          (+ my/create-selection-buffer-counter 1))
+    (setq sel-buf-name
+        (concat "selection-buffer-"
+                (int-to-string my/create-selection-buffer-counter)))
+    (set-buffer (get-buffer-create sel-buf-name))
+    (yank)
+    (set-window-buffer nil (get-buffer-create sel-buf-name)))
+#+END_SRC
+
+*** Go to matching parenthesis.
+
+#+BEGIN_SRC emacs-lisp
+(defun my/goto-match-paren(arg)
+    "Go to the matching parenthesis if on parenthesis otherwise insert '~'."
+    (interactive "p")
+    (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
+        ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
+        (t (self-insert-command (or arg 1)))))
+#+END_SRC
+
+*** CamelCase to lower_case.  Thanks to Kevin Rodgers <ihs_4664@yahoo.com> for this.
+
+#+BEGIN_SRC emacs-lisp
+;; TextFile -> text_file<string>
+(defun my/CamelCase-to-lower_case (string)
+    (let ((i 0)
+             (result "")
+             (case-fold-search nil))
+        (while (string-match "[[:upper:]][[:lower:]]*" string i)
+            (setq result
+                (concat result
+                    (substring string i (match-beginning 0))
+                    (if (> (match-beginning 0) 0) "_")
+                    (downcase (match-string 0 string))))
+            (setq i (match-end 0)))
+        (setq result
+            (concat result (substring string i)))))
+
+;; text_file<string> -> TextFile
+(defun my/lower_case-to-CamelCase (string)
+    (let ((case-fold-search nil))
+        (apply #'concat
+               (mapcar #'capitalize (split-string string "_" t)))))
+#+END_SRC
+
+*** XML pretty format
+
+#+BEGIN_SRC emacs-lisp
+(defun my/xml-pretty-format ()
+    (interactive)
+    (save-excursion
+        (shell-command-on-region (point-min) (point-max) "xmllint --format -" nil t)
+        (nxml-mode)
+        (indent-region (point-min) (point-max))))
+#+END_SRC
+
+*** JSON pretty format
+
+#+BEGIN_SRC emacs-lisp
+(defun my/json-pretty-format ()
+    (interactive)
+    (save-excursion
+        (shell-command-on-region (point-min) (point-max) "jq ." nil t)
+        (json-mode)
+        (indent-region (point-min) (point-max))))
+#+END_SRC
+
+*** Open terminal with the working directory set to the current buffer's directory or home directory
+
+#+BEGIN_SRC emacs-lisp
+;; Define a variable to store the last used directory
+(defvar my/last-terminal-directory nil
+  "The last directory where a terminal was opened.")
+
+(defun my/open-terminal-in-current-dir (&optional arg)
+  "Open terminal in the directory of the current buffer or last used directory.
+With universal prefix argument ARG, prompt for directory."
+  (interactive "P")
+  (let ((dir (cond
+              ;; With prefix arg, prompt for directory
+              (arg (read-directory-name "Open terminal in directory: " nil nil t))
+              ;; Use buffer file directory if available
+              ((buffer-file-name) (file-name-directory (buffer-file-name)))
+              ;; Use default directory if it exists and is local
+              ((and default-directory (not (file-remote-p default-directory))) default-directory)
+              ;; Use previously saved directory
+              (my/last-terminal-directory my/last-terminal-directory)
+              ;; Fall back to home directory
+              (t (expand-file-name "~"))))
+        (term (if (executable-find "x-terminal-emulator")
+                  "x-terminal-emulator"
+                (or (executable-find "xterm") nil))))
+
+    ;; Remember this directory for next time
+    (setq my/last-terminal-directory dir)
+
+    (if term
+        (if (string= term "x-terminal-emulator")
+            (start-process "terminal" nil term (concat "--working-directory=" dir))
+          ;; For xterm, we use default-directory instead of command line arg
+          (let ((default-directory dir))
+            (start-process "terminal" nil term)))
+      (message "No terminal emulator found."))))
+#+END_SRC
+
+*** Project root detection
+
+Shared between =project.el= ([[#project][Project]]) and =projectile= ([[#projectile][Projectile]]).
+The list defines the markers that identify a project root and take
+precedence over VCS markers like =.git=.  The function turns it into a
+=project-find-functions= entry — see the Project section for the
+rationale and how it's wired in.
+
+#+BEGIN_SRC emacs-lisp
+(defvar my/project-extra-markers
+  '(".claude" "CLAUDE.md" ".projectile" ".gitwrapper" ".gitw")
+  "Filenames/dirs that mark a project root, prioritised over VCS markers.")
+
+(defun my/project-find-extra-marker (dir)
+  "Project root = closest ancestor of DIR containing one of our markers.
+Returns a transient project so `project.el' uses the discovered root."
+  (when-let* ((root (locate-dominating-file
+                     dir
+                     (lambda (d)
+                       (seq-some
+                        (lambda (m) (file-exists-p (expand-file-name m d)))
+                        my/project-extra-markers)))))
+    (cons 'transient (file-name-as-directory (file-truename root)))))
+#+END_SRC
+
+** Keymaps
+
+Associate f5/f6-key with my custom keymap, where all my custom bindings can be
+defined without worrying of conflict.  Use f5/f6-f1 to display bindings
+
+#+BEGIN_SRC emacs-lisp
+(define-prefix-command 'my-f5-bindings-keymap)
+(global-set-key [(f5)] 'my-f5-bindings-keymap)
+
+(define-prefix-command 'my-f6-bindings-keymap)
+(global-set-key [(f6)] 'my-f6-bindings-keymap)
+#+END_SRC
+
+*** Keybindings
+
+#+BEGIN_SRC emacs-lisp
+;; for CZE keybord re-bound some commands
+(progn
+    (global-unset-key (kbd "C-z"))
+    (global-set-key (kbd "C-z") 'yank)
+
+    (global-unset-key (kbd "C--"))
+    (global-set-key (kbd "C--") 'undo))
+
+(if (functionp 'my/goto-match-paren)
+    (global-set-key (kbd "~") 'my/goto-match-paren))
+
+(define-key my-f5-bindings-keymap "b" 'browse-url)                      ;; ie. f5 b
+(define-key my-f5-bindings-keymap "c" 'compile)                         ;; ie. f5 c
+(define-key my-f5-bindings-keymap "g" 'rgrep)                           ;; ie. f5 g
+(define-key my-f5-bindings-keymap "j" 'better-jumper-set-jump)          ;; ie. f5 j (drop a jump marker)
+(define-key my-f5-bindings-keymap "t" 'my/open-terminal-in-current-dir) ;; ie. f5 t
+(define-key my-f5-bindings-keymap "." 'eglot-find-typeDefinition)       ;; ie. f5 . (analogue of M-. for type)
+
+;; better-jumper: vim-style jump list, populated automatically by big motions
+;; (search, M-., goto-line, ...).  Default sexp navigation on these arrows is
+;; preserved via C-M-f / C-M-b.
+(global-set-key (kbd "C-M-<left>")  'better-jumper-jump-backward)
+(global-set-key (kbd "C-M-<right>") 'better-jumper-jump-forward)
+
+;; Workspace-wide LSP symbol search (uses current project context).
+(global-set-key (kbd "M-G") 'consult-eglot-symbols)
+#+END_SRC
+
+* Abbrev
+
+Built-in expansion of short text aliases to longer phrases (see
+=C-h i g (autotype) RET= for the full manual).
+
+| =C-x a g= | =add-global-abbrev= | record a new global abbrev    |
+| =C-x a l= | =add-mode-abbrev=   | record an abbrev for the current major mode |
+| =M-/=     | =dabbrev-expand=    | expand the word at point from buffer history |
+|           | =list-abbrevs=      | show every defined abbrev      |
+|           | =edit-abbrevs=      | edit them in a temp buffer (saving the file directly is usually nicer) |
+|           | =read-abbrev-file=  | reload the abbrev table from disk |
+|           | =write-abbrev-file= | save the abbrev table to disk  |
+
+** skeletons
+
+See 'Autotyping' entry in Emacs manual for details.
+
+#+BEGIN_SRC emacs-lisp
+;; - - - - c & c++ & java
+
+    (define-skeleton c-note
+      "insert note line"
+      nil >"// NOTE martin.slouf -- "_)
+
+    (define-skeleton c-todo
+      "insert todo line"
+      nil >"// TODO martin.slouf -- "_)
+
+    (define-skeleton c-fixme
+      "insert fixme line"
+      nil >"// FIXME martin.slouf -- "_)
+
+    (define-skeleton c-hack
+      "insert hack line"
+      nil >"// HACK martin.slouf -- "_)
+
+    (define-skeleton c-if
+      "insert c if"
+      nil >"if ("_") {"?\n
+      >""?\n
+      "}">)
+
+    (define-skeleton c-ife
+      "insert c if -- else"
+      nil >"if ("_") {"?\n
+      >""?\n
+      "}">""?\n
+      >"else {"?\n
+      >""?\n
+      "}">)
+
+    (define-skeleton c-switch
+      "insert c switch"
+      nil >"switch ("_") {"?\n
+      ""?\n
+      "case 1:">""?\n
+      >"break;"?\n
+      ""?\n
+      "default:">""?\n
+      >"break;"?\n
+      ""?\n
+      "}">)
+
+    (define-skeleton c-while
+      "insert c while"
+      nil >"while ("_") {"?\n
+      >""\n
+      "}">)
+
+    (define-skeleton c-for
+      "insert c for"
+      nil >"for ("_" ; ; ) {"?\n
+      >""\n
+      "}">)
+
+    (define-skeleton c-fori
+      "insert c for with i variable"
+      nil >"for (int i = 0; i < "_"; ++i) {"?\n
+      >""\n
+      "}">)
+
+    (define-skeleton c-do
+      "insert c do -- while"
+      nil >"do {"?\n
+      >""?\n
+      "} while ("_");">)
+
+    ;; - - - - c++ specific
+
+    (define-skeleton c++-try
+      "insert c++ try"
+      nil >"try {"?\n
+      >""?\n
+      "}">""?\n
+      >"catch ("_") {"?\n
+      >""?\n
+      "}">)
+
+    (define-skeleton c++-catch
+      "insert c++ catch"
+      nil >"catch ("_") {"?\n
+      >""?\n
+      "}">)
+
+    (define-skeleton c++-class
+      "insert c++ class"
+      nil >"class "_" {"?\n
+      >""?\n
+      >"public:"?\n
+      >""?\n
+      >"};">)
+
+    ;; - - - - java specific
+
+    (define-skeleton java-while-iterator
+      "insert java while with iterator"
+      nil '(setq v1 (skeleton-read "Input Java type to iterate over: "))
+      nil >"Iterator it = "_".iterator();"?\n
+      nil >"while (it.hasNext()) {"?\n
+      >"" v1 " obj = (" v1 ") it.next();"\n
+      >""_""?\n
+      "}">)
+
+    (define-skeleton java-for
+      "insert java new for"
+      nil >"for ("_"Object obj : col ) {"?\n
+      >""\n
+      "}">)
+
+    (define-skeleton java-class
+      "insert java class"
+      nil >"public class "_" {"?\n
+      >""?\n
+      >"}">)
+
+    (define-skeleton java-interface
+      "insert java interface"
+      nil >"public interface "_" {"?\n
+      >""?\n
+      >"}">)
+
+    (define-skeleton java-synchronized
+      "insert java synchronized block"
+      nil >"synchronized ("_") {"?\n
+      >""?\n
+      >"}">)
+
+    (define-skeleton java-try-finally
+      "insert java try .. finally"
+      nil >"try {"?\n
+      >""?\n
+      "}">""?\n
+      >"catch ("_") {"?\n
+      >""?\n
+      "}">""?\n
+      >"finally {"?\n
+      >""?\n
+      "}">)
+
+    (define-skeleton java-stdout-print
+      "insert java stdout print expression"
+      nil >"System.out.println("_");")
+
+    (define-skeleton java-stderr-print
+      "insert java stderr print expression"
+      nil >"System.err.println("_");")
+
+    (define-skeleton java-getter-setter
+      "insert java getter/setter pair"
+      nil '(setq v1 (skeleton-read "Input Java type: "))
+      nil '(setq v2 (skeleton-read "Input property name: "))
+      '(setq method-part-name (concat (upcase (substring v2 0 1))
+                                      (substring v2 1)))
+      nil >"public " v1 " get" method-part-name "() {"?\n
+      >"return this." v2 ";"?\n
+      "}">""?\n?\n
+      >"public void set" method-part-name "(" v1 " " v2 ") {"?\n
+      >"this." v2 " = " v2 ";"?\n
+      "}">)
+
+    (define-skeleton java-getter-setter-synchronized
+      "insert java synchronized getter/setter pair"
+      nil '(setq v1 (skeleton-read "Input Java type: "))
+      nil '(setq v2 (skeleton-read "Input property name: "))
+      '(setq method-part-name (concat (upcase (substring v2 0 1))
+                                      (substring v2 1)))
+      nil >"public synchronized " v1 " get" method-part-name "() {"?\n
+      >"return this." v2 ";"?\n
+      "}">""?\n?\n
+      >"public synchronized void set" method-part-name "(" v1 " " v2 ") {"?\n
+      >"this." v2 " = " v2 ";"?\n
+      "}">)
+
+    (define-skeleton java-getter-setter-fireproperty
+      "insert java getter/setter pair"
+      nil '(setq v1 (skeleton-read "Input Java type: "))
+      nil '(setq v2 (skeleton-read "Input property name: "))
+      '(setq method-part-name (concat (upcase (substring v2 0 1))
+                                      (substring v2 1)))
+      '(setq property-const-name (upcase (my/CamelCase-to-lower_case v2)))
+      nil >"public " v1 " get" method-part-name "() {"?\n
+      >"return this." v2 ";"?\n
+      "}">""?\n?\n
+      >"public void set" method-part-name "(" v1 " " v2 ") {"?\n
+      >"firePropertyChange(" property-const-name
+      >", this." v2
+      >", this." v2 " = " v2 ");"?\n
+      "}">)
+
+    (define-skeleton javadoc-code
+      "insert java javadoc <code></code> pair"
+      nil "<code>"_"</code>")
+
+    (define-skeleton javadoc-em
+      "insert java javadoc <em></em> pair"
+      nil "<em>"_"</em>")
+
+    (define-skeleton javadoc-ol
+      "insert java javadoc <ol></ol> pair"
+      nil >"* <ol>"?\n
+      >"* <li>"_""?\n
+      >"* </ol>"?\n)
+
+    ;; - - - - python
+
+    (define-skeleton python-note
+      "insert note line"
+      nil "# NOTE martin.slouf -- "_)
+
+    (define-skeleton python-todo
+      "insert todo line"
+      nil "# TODO martin.slouf -- "_)
+
+    (define-skeleton python-fixme
+      "insert fixme line"
+      nil "# FIXME martin.slouf -- "_)
+
+    (define-skeleton python-hack
+      "insert hack line"
+      nil "# HACK martin.slouf -- "_)
+
+    (define-skeleton python-if
+      "insert python if"
+      nil "if "_":"?\n
+      "">)
+
+    (define-skeleton python-ife
+      "insert python if -- else"
+      nil "if "_":"?\n
+      ""?\n
+      "else:"?\n
+      "">)
+
+    (define-skeleton python-elif
+      "insert python if -- elif -- else"
+      nil "if "_":"?\n
+      ""?\n
+      "elif :"?\n
+      ""?\n
+      "else:"?\n
+      "">)
+
+    (define-skeleton python-while
+      "insert python while"
+      nil "while "_":"?\n
+      "">)
+
+    (define-skeleton python-for
+      "insert python for"
+      nil "for "_" in :"?\n
+      "">)
+
+    (define-skeleton python-fori
+      "insert python for with i variable"
+      nil "for i in "_":"?\n
+      "">)
+
+    (define-skeleton python-class
+      "insert python class"
+      nil "class "_" (object):"?\n
+      ""_"pass"?\n
+      "">)
+
+    (define-skeleton python-try
+      "insert python try -- except"
+      nil "try:"?\n
+      ""_""?\n
+      "except:"?\n
+      ""?\n
+      "finally:"?\n
+      "">)
+
+    (define-skeleton python-getter-setter
+      "insert python getter/setter pair"
+      nil '(setq attr-name (skeleton-read "Input property name: "))
+      '(setq method-part-name attr-name)
+      nil "def get_" method-part-name "(self):"?\n
+      "return self." attr-name ?\n
+      ?\n
+      "def set_" method-part-name "(self, " attr-name "):"?\n
+      "self." attr-name " = " attr-name
+      >>>?\n)
+
+    ;; - - - - php
+
+    (define-skeleton php-fori
+      "insert php for with i variable"
+      nil >"for ($i = 0; $i < "_"; ++$i) {"?\n
+      >""\n
+      "}">)
+
+    (define-skeleton php-foreach
+      "insert php foreach loop"
+      nil >"foreach ("_" as $i) {"?\n
+      >""\n
+      "}">)
+
+    (define-skeleton php-foreachkey
+      "insert php foreach loop with key => value"
+      nil >"foreach ("_" as $key => $value) {"?\n
+      >""\n
+      "}">)
+
+    ;; - - - - xml
+
+    (define-skeleton xml-note
+      "insert note line"
+      nil >"<!-- NOTE martin.slouf: "_" -->")
+
+    (define-skeleton xml-todo
+      "insert todo line"
+      nil >"<!-- TODO martin.slouf: "_" -->")
+
+    (define-skeleton xml-fixme
+      "insert fixme line"
+      nil >"<!-- FIXME martin.slouf: "_" -->")
+
+    (define-skeleton xml-hack
+      "insert hack line"
+      nil >"<!-- HACK martin.slouf: "_" -->")
+
+    ;; - - - - html
+
+    (define-skeleton html-nbsp
+      "insert html non-breaking space entity"
+      nil "&nbsp;")
+
+    (define-skeleton html-quot
+      "insert html pair of &bdquo; and &ldquo; entities"
+      nil "&bdquo;"_"&ldquo;")
+
+    (define-skeleton html-amp
+      "insert html ampersand entity"
+      nil "&amp;")
+
+    (define-skeleton html-element-brackets
+      "insert html element brackets"
+      nil "<"_"></>")
+
+    ;; - - - - org
+
+    (define-skeleton org-example-block
+      "insert org #+BEGIN_EXAMPLE / #+END_EXAMPLE block"
+      nil
+      "#+BEGIN_EXAMPLE\n"
+      _"\n"
+      "#+END_EXAMPLE\n")
+
+    (define-skeleton org-src-block
+      "insert org #+BEGIN_SRC type / #+END_SRC block querying for type"
+      "Source Type: "
+      "#+BEGIN_SRC " str "\n"
+      _"\n"
+      "#+END_SRC\n")
+
+    (define-skeleton org-plantuml-block
+      "insert org #+BEGIN_SRC type / #+END_SRC block querying for type"
+      "File: "
+      "#+BEGIN_SRC plantuml :file plantuml-" str ".png\n"
+      _"\n"
+      "class Object {\n"
+      "toString()\n"
+      "}\n"
+      "note right: java.lang.Object\n"
+      "#+END_SRC\n")
+#+END_SRC
+
+** abbrev
+
+#+BEGIN_SRC emacs-lisp
+(setq save-abbrevs nil)
+        (setq-default abbrev-mode t)
+
+        ;; abbrev definitions
+
+        (define-abbrev-table 'global-abbrev-table
+            '(
+                 ))
+
+        (define-abbrev-table 'c-mode-abbrev-table
+            '(
+                 ("note" "" c-note 0)
+                 ("todo" "" c-todo 0)
+                 ("fixme" "" c-fixme 0)
+                 ("hack" "" c-hack 0)
+                 ("ifs" "" c-if 0)
+                 ("ife" "" c-ife 0)
+                 ("switchs" "" c-switch 0)
+                 ("whiles" "" c-while 0)
+                 ("fors" "" c-for 0)
+                 ("fori" "" c-fori 0)
+                 ("dos" "" c-do 0)
+                 ))
+
+        (define-abbrev-table 'c++-mode-abbrev-table
+            '(
+                 ("note" "" c-note 0)
+                 ("todo" "" c-todo 0)
+                 ("fixme" "" c-fixme 0)
+                 ("hack" "" c-hack 0)
+                 ("ifs" "" c-if 0)
+                 ("ife" "" c-ife 0)
+                 ("switchs" "" c-switch 0)
+                 ("whiles" "" c-while 0)
+                 ("fors" "" c-for 0)
+                 ("fori" "" c-fori 0)
+                 ("dos" "" c-do 0)
+                 ("trys" "" c++-try 0)
+                 ("catchs" "" c++-catch 0)
+                 ("classc" "" c++-class 0)
+                 ))
+
+        (define-abbrev-table 'java-mode-abbrev-table
+            '(
+                 ("note" "" c-note 0)
+                 ("todo" "" c-todo 0)
+                 ("fixme" "" c-fixme 0)
+                 ("hack" "" c-hack 0)
+                 ("ifs" "" c-if 0)
+                 ("ife" "" c-ife 0)
+                 ("switchs" "" c-switch 0)
+                 ("whiles" "" c-while 0)
+                 ("whileit" "" java-while-iterator 0)
+                 ("fors" "" c-for 0)
+                 ("fori" "" c-fori 0)
+                 ("foro" "" java-for 0)
+                 ("dos" "" c-do 0)
+                 ("trys" "" c++-try 0)
+                 ("catchs" "" c++-catch 0)
+                 ("trysf" "" java-try-finally 0)
+                 ("classj" "" java-class 0)
+                 ("interfacej" "" java-interface 0)
+                 ("synchro" "" java-synchronized 0)
+                 ("stdout" "" java-stdout-print 0)
+                 ("stderr" "" java-stderr-print 0)
+                 ("gs" "" java-getter-setter 0)
+                 ("gss" "" java-getter-setter-synchronized 0)
+                 ("gsf" "" java-getter-setter-fireproperty 0)
+                 ("codej" "" javadoc-code 0)
+                 ("emj" "" javadoc-em 0)
+                 ("olj" "" javadoc-ol 0)
+                 ))
+
+        (define-abbrev-table 'groovy-mode-abbrev-table
+            '(
+                 ("note" "" c-note 0)
+                 ("todo" "" c-todo 0)
+                 ("fixme" "" c-fixme 0)
+                 ("hack" "" c-hack 0)
+                 ("ifs" "" c-if 0)
+                 ("ife" "" c-ife 0)
+                 ("switchs" "" c-switch 0)
+                 ("whiles" "" c-while 0)
+                 ))
+
+        (define-abbrev-table 'python-mode-abbrev-table
+            '(
+                 ("note" "" python-note 0)
+                 ("todo" "" python-todo 0)
+                 ("fixme" "" python-fixme 0)
+                 ("hack" "" python-hack 0)
+                 ("ifs" "" python-if 0)
+                 ("ife" "" python-ife 0)
+                 ("elifs" "" python-elif 0)
+                 ("whiles" "" python-while 0)
+                 ("fors" "" python-for 0)
+                 ("fori" "" python-fori 0)
+                 ("trys" "" python-try 0)
+                 ("classp" "" python-class 0)
+                 ("gs" "" python-getter-setter 0)
+                 ))
+
+        (define-abbrev-table 'php-mode-abbrev-table
+            '(
+                 ("note" "" c-note 0)
+                 ("todo" "" c-todo 0)
+                 ("fixme" "" c-fixme 0)
+                 ("hack" "" c-hack 0)
+                 ("ifs" "" c-if 0)
+                 ("ife" "" c-ife 0)
+                 ("switchs" "" c-switch 0)
+                 ("whiles" "" c-while 0)
+                 ("fors" "" c-for 0)
+                 ("fori" "" php-fori 0)
+                 ("feach" "" php-foreach 0)
+                 ("feachk" "" php-foreachkey 0)
+                 ("dos" "" c-do 0)
+                 ))
+
+        (define-abbrev-table 'xml-mode-abbrev-table
+            '(
+                 ("note" "" xml-note 0)
+                 ("todo" "" xml-todo 0)
+                 ("fixme" "" xml-fixme 0)
+                 ("hack" "" xml-hack 0)
+                 ("nbsp" "" html-nbsp 0)
+                 ("quot" "" html-quot 0)
+                 ("amp" "" html-amp 0)
+                 ("el" "" html-element-brackets 0)
+                 ))
+
+        (define-abbrev-table 'nxml-mode-abbrev-table
+            '(
+                 ("note" "" xml-note 0)
+                 ("todo" "" xml-todo 0)
+                 ("fixme" "" xml-fixme 0)
+                 ("hack" "" xml-hack 0)
+                 ("nbsp" "" html-nbsp 0)
+                 ("quot" "" html-quot 0)
+                 ("amp" "" html-amp 0)
+                 ("el" "" html-element-brackets 0))
+            '(parents '(xml-mode-abbrev-table) "xml" t))
+
+        (define-abbrev-table 'html-mode-abbrev-table
+            '(
+                 ("note" "" xml-note 0)
+                 ("todo" "" xml-todo 0)
+                 ("fixme" "" xml-fixme 0)
+                 ("hack" "" xml-hack 0)
+                 ("nbsp" "" html-nbsp 0)
+                 ("quot" "" html-quot 0)
+                 ("amp" "" html-amp 0)
+                 ("el" "" html-element-brackets 0))
+            '(parents '(xml-mode-abbrev-table) "xml" t))
+
+        (define-abbrev-table 'html-helper-mode-abbrev-table
+            '(
+                 ("note" "" xml-note 0)
+                 ("todo" "" xml-todo 0)
+                 ("fixme" "" xml-fixme 0)
+                 ("hack" "" xml-hack 0)
+                 ("nbsp" "" html-nbsp 0)
+                 ("quot" "" html-quot 0)
+                 ("amp" "" html-amp 0)
+                 ("el" "" html-element-brackets 0))
+            '(parents '(html-mode-abbrev-table) "html" t))
+
+        (define-abbrev-table 'web-mode-abbrev-table
+            '(
+                 ("note" "" xml-note 0)
+                 ("todo" "" xml-todo 0)
+                 ("fixme" "" xml-fixme 0)
+                 ("hack" "" xml-hack 0)
+                 ("nbsp" "" html-nbsp 0)
+                 ("quot" "" html-quot 0)
+                 ("amp" "" html-amp 0)
+                 ("el" "" html-element-brackets 0))
+            '(parents '(xml-mode-abbrev-table) "xml" t))
+
+        (define-abbrev-table 'org-mode-abbrev-table
+            '(
+                 ("exb" "" org-example-block 0)
+                 ("srcb" "" org-src-block 0)
+                 ("umlb" "" org-plantuml-block 0)
+                 ))
+
+        (define-abbrev-table 'sh-mode-abbrev-table
+            '(
+                 ("note" "" python-note 0)
+                 ("todo" "" python-todo 0)
+                 ("fixme" "" python-fixme 0)
+                 ("hack" "" python-hack 0)
+                 ))
+#+END_SRC
+
+* Bookmarks
+
+Bookmarks are stored in =my-bookmarks= inside =doom-private-dir=
+(symlinked or version-controlled along with the rest of this config).
+
+| =C-x r m=     | =bookmark-set=        | set a bookmark at point |
+| =C-x r b=     | =bookmark-jump=       | jump to a bookmark      |
+| =C-x r l=     | =bookmark-bmenu-list= | list all bookmarks      |
+|               | =bookmark-save=       | save bookmarks to disk  |
+
+#+BEGIN_SRC emacs-lisp
+(setq! bookmark-default-file (expand-file-name "my-bookmarks" doom-private-dir))
+#+END_SRC
+
+* Claude Code
+
+Integration with the [[https://github.com/manzaltu/claude-code-ide.el][claude-code-ide.el]]
+package — an MCP-based bridge between the =claude= CLI and Emacs.
+Requires the CLI to be installed and authenticated:
+
+#+BEGIN_SRC sh
+npm install -g @anthropic-ai/claude-code
+claude --version
+claude    # run once interactively to authenticate
+#+END_SRC
+
+The package itself is declared in =packages.el=. Use =vterm= as the
+terminal backend (cleaner TUI rendering than =eat=). Bind the
+transient menu under the existing =f5= prefix.
+
+** Window placement
+
+Claude lives in a *regular* buffer — no side window, no atomic display
+rule — so all of Emacs' standard window commands (=C-x 1=, =C-x 2=,
+=C-x 0=, =switch-to-buffer=, …) work on it like any other buffer.
+=claude-code-ide-use-side-window= is off for the same reason: side
+windows survive =delete-other-windows=, which would defeat the
+maximize behaviour below.
+
+We also turn off =claude-code-ide-use-ide-diff= so Claude does *not*
+launch =ediff=; instead it prints its diff inline inside the terminal.
+The package's =ediff= settings are otherwise left at their defaults —
+they just go unused.
+
+=f5 i= is a custom toggle: pressing it from another buffer switches to
+Claude and maximizes the window (=delete-other-windows=); pressing it
+from inside Claude returns to the previous buffer.  After that you're
+free to split / rearrange normally.
+
+#+BEGIN_SRC emacs-lisp
+(defun my/claude-toggle ()
+  "Toggle into / out of the project's Claude Code buffer.
+On switch-in the window is maximized via =delete-other-windows=; on
+switch-out we just =switch-to-prev-buffer= and let the user manage
+windows from there."
+  (interactive)
+  (let* ((buffer-name (claude-code-ide--get-buffer-name))
+         (buffer (get-buffer buffer-name)))
+    (cond
+     ((null buffer)
+      (user-error "No Claude Code session for this project — start one with `f5 a` → `s`"))
+     ((eq (current-buffer) buffer)
+      (switch-to-prev-buffer))
+     (t
+      (switch-to-buffer buffer)
+      (delete-other-windows)))))
+
+(use-package! claude-code-ide
+  :bind (:map my-f5-bindings-keymap
+              ("a" . claude-code-ide-menu)   ;; f5 a — full transient (a = AI)
+              ("i" . my/claude-toggle))      ;; f5 i — switch in (maximize) / out
+  :config
+  (setq claude-code-ide-terminal-backend 'vterm
+        claude-code-ide-use-side-window  nil   ;; regular window, ediff-friendly
+        claude-code-ide-use-ide-diff     nil)  ;; no ediff; inline terminal diff instead
+
+  (claude-code-ide-emacs-tools-setup))
+#+END_SRC
+
+** Scrolling inside the Claude buffer
+
+In =vterm-mode= the arrow / page keys are sent to the terminal program,
+so you can't normally scroll back through Claude's output.  Use
+=vterm-copy-mode=:
+
+| =C-c C-t= | toggle =vterm-copy-mode=. In copy-mode, normal Emacs motion (=C-v=, =M-v=, arrows, =M-<= / =M->=, =isearch=, …) navigates the buffer; press =C-c C-t= or =RET= to drop back into terminal input |
+
+The mouse wheel also scrolls in either mode.
+
+* Company
+
+In-buffer code completion as you type.  Note: =company= and =vertico=
+are orthogonal — =company= handles completion-at-point inside buffers,
+=vertico= handles minibuffer narrowing (=M-x=, =find-file=, etc.).
+Both stay enabled.
+
+#+BEGIN_SRC emacs-lisp
+(after! company
+  (setq
+   company-idle-delay 0.5
+   company-minimum-prefix-length 2
+   company-show-quick-access t))
+#+END_SRC
+
+* Consult
+
+Doom enables =vertico=, =consult=, =embark=, and =marginalia= by default.
+Defaults:
+
+- =M-x=, =C-x b=, =C-x C-f= → vertico minibuffer
+- =C-x b= → =consult-buffer= (combined buffers + recentf, the helm-mini
+  replacement)
+- =M-y= → =consult-yank-pop=
+
+Custom bindings to preserve old muscle memory:
+
+#+BEGIN_SRC emacs-lisp
+(use-package! consult
+  :bind (("C-<f12>" . consult-line)
+         :map my-f5-bindings-keymap
+         ("s" . consult-line)
+         ("r" . consult-ripgrep)))
+#+END_SRC
+
+* Copilot
+
+#+BEGIN_SRC sh
+apt install npm
+#+END_SRC
+
+Execute ~M-x copilot-install-server~ to install Copilot server.
+
+#+BEGIN_SRC emacs-lisp
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+;;  :disabled
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+#+END_SRC
+
+* Dired-sidebar
+
+#+BEGIN_SRC emacs-lisp
+(use-package! dired-sidebar
+  :commands (dired-sidebar-toggle-sidebar)
+  :init (add-hook 'dired-sidebar-mode-hook
+                  (lambda ()
+                    (unless (file-remote-p default-directory)
+                      (auto-revert-mode))))
+  :config
+  (progn
+    (push 'split-window-vertically dired-sidebar-toggle-hidden-commands)
+    (push 'split-window-horizontally dired-sidebar-toggle-hidden-commands)
+    (setq dired-sidebar-use-term-integration t)
+    (setq dired-sidebar-theme 'ascii))
+  :bind (:map my-f5-bindings-keymap
+              ("d" . dired-sidebar-toggle-sidebar)))
+#+END_SRC
+
+* Direx
+
+Use Doom's =set-popup-rule!= to place direx on the left, 30 columns wide,
+dedicated, no select on open.
+
+#+BEGIN_SRC emacs-lisp
+(use-package! direx
+  :config
+  (set-popup-rule! "^\\*direx:" :side 'left :size 35 :select nil :quit nil)
+  :bind (:map my-f5-bindings-keymap
+              ("x" . direx:jump-to-directory-other-window)))
+#+END_SRC
+
+* Ediff
+
+Tame ediff: keep it in the current frame, side-by-side, and restore the
+window layout on quit (via =winner-undo=).  This is also what =claude-code-ide=
+uses when it presents accept/reject hunk-by-hunk diffs of suggested edits.
+
+#+BEGIN_SRC emacs-lisp
+(after! ediff
+  (setq ediff-window-setup-function #'ediff-setup-windows-plain)
+  (setq ediff-split-window-function #'split-window-horizontally)
+  (add-hook 'ediff-after-quit-hook-internal #'winner-undo))
+#+END_SRC
+
+* Highlight-symbol
+
+#+BEGIN_SRC emacs-lisp
+(use-package! highlight-symbol
+  :config (highlight-symbol-mode t)
+  :bind (:map my-f5-bindings-keymap
+         ("hh" . highlight-symbol-at-point)
+         ("hn" . highlight-symbol-next)
+         ("hp" . highlight-symbol-prev)
+         ("hr" . highlight-symbol-query-replace)
+         ("hx" . highlight-symbol-remove-all)))
+ #+END_SRC
+
+* IBuffer
+
+#+BEGIN_SRC emacs-lisp
+(use-package! ibuffer
+  :config
+  (setq ibuffer-saved-filter-groups
+        (quote (("default"
+                 ("root" (filename . "root@localhost"))
+                 ("oracle" (filename . "oracle@localhost"))
+
+                 ("linuxconf" (or (filename . "linuxconf/")
+                                  (filename . ".bash-it/")))
+                 ;; my projects
+                 ("summer" (filename . "src/.*/summer/"))
+                 ("mcc" (filename . "src/.*/mcc/"))
+                 ("drd" (filename . "wrk/drd/.*"))
+
+                 ;; my contractor projects
+                 ("justlogin" (or
+                               (filename . "src/justlogin/.*")
+                               (filename . "zvn/justlogin/.*")
+                               (filename . "www/justlogin.loc/.*")))
+                 ("dain" (or
+                          (filename . "src/dain/.*")
+                          (filename . "zvn/dain/.*")
+                          (filename . "www/dain.loc/.*")))
+                 ("dain :: o2-cloud" (or
+                                      (filename . "/ssh:.*@ispop.*")
+                                      (filename . "/ssh:.*@adobe.*")
+                                      (filename . "/ssh:.*@env.*")
+                                      (filename . "/ssh:.*@dev\-test.*")))
+                 ("livesystems :: OpenTreasury" (or
+                                                 (filename . ".*/livesystems/.*opentreasury.*")))
+                 ("livesystems :: STARnet" (or
+                                            (filename . ".*/livesystems/.*starnet.*")))
+                 ("livesystems" (or
+                                 (filename . "src/livesystems/.*")
+                                 (filename . "zvn/livesystems/.*")))
+                 ;; general modes
+                 ("Mail" (or
+                          (mode . post-mode)
+                          (mode . mail-mode)
+                          (mode . message-mode)
+                          (mode . notmuch-hello-mode)
+                          (mode . notmuch-search-mode)
+                          (mode . notmuch-show-mode)
+                          (mode . notmuch-message-mode)
+                          (name . "*Notmuch Errors*")))
+                 ("other" (filename . "^[^*]"))
+                 ("Magit" (name . "\*magit"))
+                 ("Subversion" (name . "\*svn"))))))
+
+  (add-hook 'ibuffer-mode-hook
+            (lambda()
+              (ibuffer-auto-mode 1)
+              (ibuffer-switch-to-saved-filter-groups "default")))
+
+  :bind ("C-x C-b" . ibuffer))
+#+END_SRC
+
+* ISpell
+
+#+BEGIN_SRC emacs-lisp
+(after! ispell
+  ;; default is american english
+  (setq ispell-dictionary "en_US")
+  (setq ispell-local-dictionary "en_US"))
+
+;; use 'M-x ispell-czech' to use czech dictionaries
+(defun ispell-czech()
+  "sets czech dictionaries for ispell"
+  (interactive)
+  (ispell-change-dictionary "cs"))
+#+END_SRC
+
+* Magit
+
+Primary Git interface — =M-x magit-status= (often bound to =SPC g g=
+in evil-Doom; in non-evil setups =C-x g= is conventional).
+
+The built-in =vc.el= still has its uses for one-file-at-a-time work,
+even alongside Magit:
+
+| =C-x v v= | =vc-next-action= | does the next sensible thing for the current file (add it if untracked, commit it if modified, …) |
+| =C-x v l= | log of the current file |
+| =C-x v == | diff of the current file |
+| =C-c C-c= | finish the commit-message buffer when prompted |
+
+#+BEGIN_SRC emacs-lisp
+(after! magit
+  (setq
+   magit-log-margin (quote (t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
+   magit-diff-highlight-indentation nil
+   magit-diff-highlight-trailing nil
+   magit-diff-paint-whitespace nil
+   magit-diff-highlight-hunk-body nil
+   magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1
+   magit-diff-refine-hunk nil))
+#+END_SRC
+
+
+* Multiple Cursors
+
+See https://github.com/magnars/multiple-cursors.el .
+
+| =C-S-c C-S-c= | =mc/edit-lines=          | when a region spans several lines, place one cursor on each |
+| =C->=         | =mc/mark-next-like-this= | mark the next occurrence of the symbol at point             |
+| =C-<=         | =mc/mark-previous-like-this= | mark the previous occurrence                            |
+| =C-c C-<=     | =mc/mark-all-like-this=  | mark every occurrence in the buffer                         |
+
+To leave =multiple-cursors-mode=, press =RET= or =C-g= (the latter
+first removes the additional regions).  Insert a literal newline
+inside multi-cursor mode with =C-j=.
+
+#+BEGIN_SRC emacs-lisp
+(use-package! multiple-cursors
+  :bind
+  (("C-S-c C-S-c" . mc/edit-lines)
+   ("C->" . mc/mark-next-like-this)
+   ("C-<" . mc/mark-previous-like-this)
+   ("C-c C-<" . mc/mark-all-like-this)))
+#+END_SRC
+
+* Notmuch
+
+Mail client — =M-x notmuch= (also bound to =f5 m=).
+
+** Reading
+
+| =.= =v= | =notmuch-show-view-part= | open a MIME part with the external viewer from =.mailcap= |
+| =.= =s= | =notmuch-show-save-part= | save the MIME part at point to a file                     |
+| =r=     |                          | reply to all                                              |
+| =R=     |                          | reply to sender only                                      |
+
+** Composing (=message-mode=)
+
+| =C-c C-c= |                   | send the message and close the buffer |
+| =C-c C-a= | =mml-attach-file= | attach a file                          |
+| =C-c C-d= |                   | postpone (save as draft)               |
+| =C-c C-k= |                   | discard the message                    |
+
+#+BEGIN_SRC emacs-lisp
+;; open notmuch with f5 m (notmuch is an autoloaded command)
+(define-key my-f5-bindings-keymap "m" 'notmuch)
+
+(after! notmuch
+
+    (use-package! gnus-alias
+      :init
+      (progn
+
+        (setq gnus-alias-identity-alist
+              '(
+                ("default"
+                 nil ;; Does not refer to any other identity
+                 "Martin Šlouf <mar@centrum.cz>" ;; Sender address
+                 nil ;; Organization header
+                 (("Bcc" . "mar@centrum.cz")) ;; Extra headers
+                 nil ;; Extra body text
+                 nil) ;; Signature file
+                ("slouf.name"
+                 nil
+                 "Martin Šlouf <martin@slouf.name>"
+                 "Martin Šlouf"
+                 (("Bcc" . "martin@slouf.name"))
+                 nil
+                 "~/Maildir/signatures/slouf.name.signature")
+                ("gmail.com"
+                 nil
+                 "Martin Šlouf <martin@slouf.name>" ;; must match the outgoing SMTP server
+                 "Martin Šlouf"
+                 (
+                  ("Bcc" . "martin.slouf@gmail.com")
+                  ("Reply-To" . "martin.slouf@gmail.com"))
+                 nil
+                 nil)
+                ("justlogin.cz"
+                 nil
+                 "Martin Šlouf <martin.slouf@justlogin.cz>"
+                 "JustLogin"
+                 (("Bcc" . "martin.slouf@justlogin.cz"))
+                 nil
+                 nil)
+                ("justnet.cz"
+                 nil
+                 "Martin Šlouf <martin.slouf@justnet.cz>"
+                 "JustLogin"
+                 (("Bcc" . "martin.slouf@justnet.cz"))
+                 nil
+                 nil)
+                ("dain"
+                 nil
+                 "Martin Šlouf <martin.slouf@dain.cz>"
+                 "Dain s.r.o."
+                 (("Bcc" . "martin.slouf@dain.cz"))
+                 nil
+                 "~/Maildir/signatures/dain.signature")
+                ("livesystems"
+                 nil
+                 "Martin Šlouf <martin.slouf@livesystems.cz>"
+                 "Livesystems s.r.o."
+                 (("Bcc" . "martin.slouf@livesystems.cz"))
+                 nil
+                 "~/Maildir/signatures/livesystems.signature")
+                ))
+
+        ;; Set default identity
+        (setq gnus-alias-default-identity "default")
+        ;; Define rules to match work identity
+        (setq gnus-alias-identity-rules
+              '(
+                ("slouf.name"
+                 ("any" "martin@slouf\\.name" current)
+                 "slouf.name")
+                ("gmail.com"
+                 ("any" "martin.slouf@gmail\\.com" current)
+                 "gmail.com")
+                ("justlogin.cz"
+                 ("any" "martin\\.slouf@justlogin\\.cz" current)
+                 "justlogin.cz")
+                ("justnet.cz"
+                 ("any" "martin\\.slouf@justnet\\.cz" current)
+                 "justnet.cz")
+                ("dain"
+                 ("any" "martin\\.slouf@dain\\.cz" current)
+                 "dain")
+                ("livesystems"
+                 ("any" "martin\\.slouf@livesystems\\.cz" current)
+                 "livesystems")
+                )
+              )
+        ;; Let gnus-alias override addresses
+        (setq gnus-alias-override-user-mail-address t)
+        ;; Error if cannot determine identity
+        (setq gnus-alias-unknown-identity-rule 'error)
+        ;; Determine identity when message-mode loads
+        (add-hook 'message-setup-hook 'gnus-alias-determine-identity)))
+
+    ;; saved searches
+    (setq notmuch-saved-searches
+          '(
+            (:name "inbox" :query "tag:inbox and date:3months..now" :key "i")
+            (:name "unread" :query "tag:unread and date:3months..now" :key "u")
+            (:name "flagged" :query "tag:flagged" :key "f")
+            (:name "sent" :query "tag:sent and date:6months..now" :key "t")
+            (:name "drafts" :query "tag:draft")
+            (:name "all mail" :query "date:6months..now" :key "a")
+            (:name "martin@slouf.name" :query "tag:slouf.name and date:6months..now" :key "m")
+            (:name "martin.slouf@gmail.com" :query "tag:gmail and date:6months..now" :key "g")
+            (:name "mar@centrum.cz" :query "to:mar@centrum.cz and date:6months..now" :key "c")
+            (:name "justlogin" :query "tag:justlogin and date:6months..now" :key "j")
+            (:name "dain" :query "tag:dain and date:6months..now" :key "d")
+            (:name "dain-support" :query "tag:dain-support and date:6months..now")
+            (:name "livesystems" :query "tag:livesystems and date:6months..now" :key "l")
+            (:name "livesystems-support" :query "tag:livesystems-support and date:6months..now")))
+
+    ;; viewing email
+    (setq notmuch-search-oldest-first nil)
+    (set-face-foreground 'notmuch-search-unread-face "deep sky blue")
+    (set-face-foreground 'notmuch-search-flagged-face "dark orange")
+
+    ;; writing email
+    (define-key notmuch-show-mode-map "r" 'notmuch-show-reply)
+    (define-key notmuch-show-mode-map "R" 'notmuch-show-reply-sender)
+    (define-key notmuch-tree-mode-map "r" 'notmuch-show-reply)
+    (define-key notmuch-tree-mode-map "R" 'notmuch-show-reply-sender)
+    (define-key notmuch-search-mode-map "r" 'notmuch-search-reply-to-thread)
+    (define-key notmuch-search-mode-map "R" 'notmuch-search-reply-to-thread-sender)
+    (setq mail-user-agent (quote message-user-agent))
+    (setq notmuch-fcc-dirs ".Sent") ;; keep sent mail in .Sent folder
+
+    ;; writing email in gnus message-mode buffer
+    (setq message-kill-buffer-on-exit t) ;; kill emacs message buffers
+    (setq message-default-mail-headers "Cc: \nBcc: \n")
+    (setq message-directory "~/Maildir") ;; keep drafts in .Drafts folder
+    (defun my-message-mode-hook()
+      ;; use org structures and tables in message mode
+      (orgalist-mode t)
+      (turn-on-orgtbl)
+      ;; unset M-RET (message-newline-and-reformat) as it is bound to company-complete
+      (local-unset-key (kbd "M-RET")))
+    (add-hook 'message-mode-hook 'my-message-mode-hook)
+
+    ;; sending mail
+    (setq send-mail-function (quote sendmail-send-it)))
+#+END_SRC
+
+* Org
+
+Reference docs:
+
+- =C-h i d g org RET= — built-in info manual
+- [[https://orgmode.org/manual/][HTML manual]]
+- [[https://orgmode.org/worg/org-tutorials/index.html][Worg tutorials]]
+
+** Structure editing
+
+| =M-<left>=  | =org-do-promote= | promote (raise level) the current heading; with a region, every selected heading |
+| =M-<right>= | =org-do-demote=  | demote (lower level)                                                              |
+| =M-<up>=    | =org-metaup=     | move heading or list item up                                                      |
+| =M-<down>=  | =org-metadown=   | move heading or list item down                                                    |
+
+** Folding & navigation
+
+| =TAB=     | local subtree cycling (FOLDED → CHILDREN → SUBTREE) |
+| =S-TAB=   | global cycling (same as =C-u TAB=)                  |
+| =C-c C-b= | previous heading at the same level                  |
+| =C-c C-f= | next heading at the same level                      |
+
+** Editing inside a heading
+
+| =S-<right>= | =org-shiftright=    | next TODO keyword                            |
+| =S-<left>=  | =org-shiftleft=     | previous TODO keyword                        |
+| =C-c C-c=   | =org-ctrl-c-ctrl-c= | toggle a checkbox / re-align a table / dispatch contextual action |
+| =C-c C-l=   | =org-insert-link=   | insert/edit a hyperlink                      |
+| =C-u C-c C-l= | same with file completion                                  |
+| =C-c C-o=   | =org-open-at-point= | follow the link at point                     |
+| =C-c C-q=   | =org-set-tags-command= | edit tags of the current heading          |
+
+** Export
+
+| =C-c C-e=   | =org-export-dispatch= | export menu               |
+| =C-c C-e h h= | export current buffer/subtree to HTML |
+
+** Markup quick-reference
+
+#+BEGIN_EXAMPLE
+*bold*  /italics/  _underlined_  =verbatim=  +strike+  ~code~
+
+----- horizontal rule (5+ dashes)
+
+  - bullet item
+  - another item
+
+  term1 :: description
+  term2 :: description
+
+#+BEGIN_SRC python -n
+-n on a code block adds line numbers
+#+END_SRC
+
+#+NAME: my-anchor
+[[my-anchor][link to it]]
+#+END_EXAMPLE
+
+** Tables
+
+#+BEGIN_EXAMPLE -n
+|         |                 | <30>                                              |
+| C-c C-c | org-table-align | re-align the table without moving point           |
+| TAB     | org-table-align | re-align *and* move point to the next cell        |
+#+END_EXAMPLE
+
+The =<30>= row pins a column width to 30 characters.  To edit a long
+field that has been truncated, press =C-c \`= to pop the field into a
+dedicated buffer.
+
+#+BEGIN_SRC emacs-lisp
+(after! org
+    ;; for doom emacs download using M-x plantuml-download-jar
+    ;;(setq org-plantuml-jar-path "/home/martin/.local/opt/plantuml.jar")
+    ;; doom emacs uses its own ditaa.jar
+    ;;(setq org-ditaa-jar-path "/usr/share/ditaa/ditaa.jar")
+
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '(
+       (ditaa . t)
+       (emacs-lisp . t)
+       (gnuplot . t)
+       (dot . t) ;; graphviz
+       (js . t)
+       (latex . t)
+       (perl . t)
+       (plantuml . t)
+       (python . t)
+       (shell . t) ;; shell
+       (sql . t)
+       (sqlite . t)
+       ))
+
+    (setq org-export-with-smart-quotes t)
+    (setq org-startup-folded t)
+    (setq org-todo-keywords
+          '((sequence "TODO(t)" "FEEDBACK(f)" "VERIFY(v)" "|"
+                      "DONE(d)" "CANCELLED(c)")))
+
+  ;; org-capture see M-x org-capture (C-c n n)
+  (setq
+   org-default-notes-file "~/Sync/notes.org"
+   org-capture-templates
+   '(("t" "Todo" entry (file+headline org-default-notes-file "Agenda")
+      "* TODO %?\n  %i\n  %a")
+     ("j" "Journal" entry (file+olp+datetree org-default-notes-file "Journal")
+      "* %?\nEntered on %U\n  %i\n  %a" :tree-type month))))
+#+END_SRC
+
+* Plantuml
+
+#+BEGIN_SRC emacs-lisp
+(after! plantuml-mode
+  (setq plantuml-default-exec-mode 'jar)
+  ;; apt install plantuml
+  (setq plantuml-jar-path "/usr/share/plantuml/plantuml.jar")
+  (setq org-plantuml-jar-path (expand-file-name "/usr/share/plantuml/plantuml.jar")))
+#+END_SRC
+
+
+* Project
+
+Treat the following files/directories as authoritative project-root
+markers, taking precedence over =.git= and any other VCS markers:
+
+- =.projectile= — projectile's manual project marker
+- =.gitwrapper=, =.gitw= — my `gitw` wrapper conventions
+- =.claude/=, =CLAUDE.md= — Claude Code project state and instructions
+
+** Why a custom finder (and not just =project-vc-extra-root-markers=)
+
+=project-vc-extra-root-markers= registers extras *at the same level*
+as VCS markers: =project.el= walks outward from the buffer and the
+**closest** marker wins, regardless of its type.  In a monorepo with
+git submodules this means a deeper =.git/= would beat a shallower
+=CLAUDE.md= — the opposite of what we want.
+
+The =my/project-find-extra-marker= helper (defined in [[#project-root-detection][Utility
+functions › Project root detection]]) is registered in
+=project-find-functions= with a very negative depth, so it runs *before*
+=project-try-vc=.  If any of our markers is found walking up, that's
+the project root; if not, we fall through and =project-try-vc= handles
+the buffer with its usual VCS detection.
+
+The order of markers in the list is *not* a priority list — at each
+directory walking up we only ask "does this contain any of them".
+The first directory with any match wins.
+
+** Implementation
+
+#+BEGIN_SRC emacs-lisp
+(after! project
+  ;; Run before `project-try-vc' so our markers override .git.
+  (add-hook 'project-find-functions #'my/project-find-extra-marker -90))
+#+END_SRC
+
+In any buffer inside a project, =M-x project-current= returns
+=(transient . "/path/to/root/")= with the discovered root.  Comparing
+it with =M-x projectile-project-root= (see [[#projectile][Projectile]]) is a quick
+sanity check that both systems agree.
+
+* Projectile
+
+Projectile keeps its own list of root markers in
+=projectile-project-root-files-bottom-up=, and unlike =project.el=,
+**list order is priority**: each marker is searched independently, and
+the first one that finds anything (walking up from the buffer) wins.
+
+Prepending =my/project-extra-markers= (defined in [[#project-root-detection][Utility functions ›
+Project root detection]]) to that list gives projectile the same
+precedence semantics as the [[#project][Project]] section above — markers like
+=CLAUDE.md= take priority over =.git=, even if =.git= is closer to the
+buffer.  =delete-dups= keeps the first (our) occurrence of =.projectile=
+when projectile's defaults already include it.
+
+#+BEGIN_SRC emacs-lisp
+(after! projectile
+  (setq projectile-project-root-files-bottom-up
+        (delete-dups
+         (append my/project-extra-markers
+                 projectile-project-root-files-bottom-up))))
+#+END_SRC
+
+=M-x projectile-project-root= reports projectile's view of the project
+root.  Compare it with =M-x project-current= (see [[#project][Project]]) — for any
+buffer in the tree, both should agree after =M-x doom/reload=.
+
+* Python
+
+Doom's =:lang (python +lsp)= module provides LSP via Eglot
+(=:tools (lsp +eglot)=). The recommended language server is =pyright=
+— install once, system-wide, with one of:
+
+#+BEGIN_SRC sh
+npm install -g pyright            # preferred
+# or
+pip install pyright
+# alternative server:
+pip install python-lsp-server[all]
+#+END_SRC
+
+** Auto-activate project-local =.venv=
+
+If the project root contains a =.venv/= directory, activate it
+automatically when entering a Python buffer.  Project root is
+discovered via =project.el=, which honors our
+=project-vc-extra-root-markers= (=.projectile=, =.gitwrapper=, =.gitw=)
+in addition to VCS directories.
+
+The hook runs before Eglot starts, so the language server inherits
+the venv's Python interpreter and sees its installed packages.
+
+#+BEGIN_SRC emacs-lisp
+(defun my/python-activate-project-venv ()
+  "Activate `.venv' at the current project root, if one exists.
+Uses `project.el' so the same root markers as `claude-code-ide'
+and friends apply."
+  (when-let* ((proj (project-current))
+              (root (project-root proj))
+              (venv (expand-file-name ".venv" root)))
+    (when (file-directory-p venv)
+      (require 'pyvenv)
+      (pyvenv-activate venv))))
+
+(add-hook 'python-mode-hook #'my/python-activate-project-venv)
+#+END_SRC
+
+** REPL
+
+| =M-x run-python= | start an inferior Python process; =company-mode= completion (=M-RET= = =company-complete=) gets noticeably better once it is running |
+
+#+BEGIN_SRC emacs-lisp
+(after! python
+  (setq python-shell-interpreter "ipython3"
+        python-shell-interpreter-args "-i --simple-prompt"))
+
+(defalias 'workon 'pyvenv-workon)
+#+END_SRC
+
+** Diagnostics (Flymake)
+
+Eglot reports Pyright diagnostics through =flymake= (the modern,
+built-in successor to the old flymake; conceptually the same role
+that =flycheck= used to fill).  No extra configuration is required —
+just open a Python file inside an LSP-managed project.
+
+| =M-g M-n= / =M-g M-p= | next / previous diagnostic                |
+| =M-x consult-flymake= | pick from all diagnostics in the buffer   |
+| =M-x flymake-show-buffer-diagnostics= | dedicated diagnostics buffer |
+
+** Debugging
+
+| =M-x pdb= | start =pdb= on the current Python module — Emacs switches to =gud-mode= |
+
+In =gud-mode=:
+
+| =C-x C-a C-b= | =gud-break=         | breakpoint on the current line                  |
+| =C-x C-a C-d= | =gud-remove=        | clear breakpoint on the current line            |
+| =C-x C-a C-s= | =gud-step=          | step into                                       |
+| =C-x C-a C-n= | =gud-next=          | step over                                       |
+| =C-x C-a C-r= | =gud-cont=          | continue                                        |
+
+* Tramp
+
+Open a remote file with =C-x C-f= and a TRAMP path:
+
+#+BEGIN_EXAMPLE
+/method:user@host:/path/to/file
+#+END_EXAMPLE
+
+Common recipes:
+
+| =C-x C-f /su:root@localhost:/etc/hosts=     | edit a local file as root           |
+| =C-x C-f /su:oracle@localhost:/home/oracle/= | edit as another local user (oracle) |
+| =C-x C-f /ssh:martin@host:~/notes.org=       | edit a file on a remote host        |
+| =C-x C-f /sudo::/etc/hosts=                  | shorthand for sudo on localhost     |
+
+#+BEGIN_SRC emacs-lisp
+(after! tramp
+  (setq tramp-default-method "ssh")
+  (setq tramp-default-user "martin"))
+#+END_SRC
+
+* Treemacs
+  :bind (:map my-f5-bindings-keymap
+         ("hh" . highlight-symbol-at-point)
+         ("hn" . highlight-symbol-next)
+         ("hp" . highlight-symbol-prev)
+         ("hr" . highlight-symbol-query-replace)
+         ("hx" . highlight-symbol-remove-all)))
+
+#+BEGIN_SRC emacs-lisp
+(use-package! treemacs
+  :config
+  ;; follow/filewatch/git-mode are already enabled by Doom's :ui treemacs;
+  ;; setting them via setq would be a no-op anyway (they are modes, not vars)
+  (setq treemacs-width 35
+        treemacs-text-scale -1
+        treemacs-is-never-other-window t)
+
+  ;; Custom formatting for project files
+  (treemacs-define-custom-icon "🐍" "py")
+  (treemacs-define-custom-icon "☕" "java")
+  (treemacs-define-custom-icon "🔧" "tf")
+  (treemacs-define-custom-icon "📋" "yaml" "yml")
+  (treemacs-define-custom-icon "🐳" "dockerfile")
+
+  :bind (:map my-f6-bindings-keymap
+              ("w" . treemacs-select-window)
+              ("1" . treemacs-delete-other-windows)
+              ("B" . treemacs-bookmark)
+              ("ff" . treemacs-find-file)
+              ("ft" . treemacs-find-tag)
+              ("pa" . treemacs-add-project-to-workspace)
+              ("pd" . treemacs-remove-project-from-workspace)))
+
+(use-package! treemacs-projectile
+  :after (treemacs projectile))
+
+(use-package! treemacs-magit
+  :after (treemacs magit))
+#+END_SRC
+
+* Uniquify
+
+#+BEGIN_SRC emacs-lisp
+;; buffers with same name will be distinguished by path, not order
+(setq uniquify-buffer-name-style 'post-forward)
+
+#+END_SRC
+
+* Vterm
+
+In =vterm-mode= almost every key is captured and forwarded to the
+terminal program (e.g. Claude's TUI), so chord sequences like =f5 i=
+don't reach Emacs.
+
+Adding =<f5>= to =vterm-keymap-exceptions= isn't enough on its own:
+even when the prefix key itself escapes vterm, the *next* key in the
+chord (=i=) still hits vterm's =[t]= catch-all and is sent to the
+terminal.
+
+Workaround: install the whole =my-f5-bindings-keymap= /
+=my-f6-bindings-keymap= as the =<f5>= / =<f6>= prefix in
+=vterm-mode-map=.  A major-mode binding wins over the catch-all, so
+the chord resolves in our prefix keymap before vterm can grab the
+suffix.  Both maps are shared by reference, so any binding added to
+them later (=define-key my-f5-bindings-keymap ...=) automatically
+works inside vterm too.
+
+#+BEGIN_SRC emacs-lisp
+(after! vterm
+  (define-key vterm-mode-map (kbd "<f5>") my-f5-bindings-keymap)
+  (define-key vterm-mode-map (kbd "<f6>") my-f6-bindings-keymap))
+#+END_SRC
+
+* Wgrep
+
+Lets you edit grep / occur / consult-ripgrep result buffers as if
+they were the underlying files — perfect for project-wide
+search-and-replace.
+
+From inside a grep-style buffer:
+
+| =C-c C-p= | =wgrep-change-to-wgrep-mode= | enter edit mode |
+
+In =wgrep-mode=:
+
+| =C-c C-e= | apply changes back to the file buffers                         |
+| =C-c C-u= | unmark all changes (ignore them)                               |
+| =C-c C-d= | mark current line for deletion (including its newline)         |
+| =C-c C-r= | drop changes inside the region (those changes won't be applied) |
+| =C-c C-p= | toggle the read-only area                                      |
+| =C-c C-k= | discard everything and exit                                    |
+| =C-x C-q= | exit =wgrep-mode=                                              |
+
+When you're done, =M-x wgrep-save-all-buffers= flushes the modified
+files to disk.
+
+#+BEGIN_SRC emacs-lisp
+(use-package! wgrep)
+#+END_SRC
+
+* Whitespace
+
+Show trailing whitespace and strip it on save in text/prog/conf
+buffers.
+
+** Why the previous setup stopped working
+
+The old block had three problems:
+
+1. =(setq whitespace-mode 1)= sets a *variable*; it doesn't toggle the
+   minor mode.  To enable a mode, you call =(whitespace-mode 1)= or
+   =(global-whitespace-mode 1)= — never =setq=.
+2. =(after! whitespace ...)= waits for the =whitespace= library to load,
+   which doesn't happen until something explicitly requires it.  So the
+   body — including the save-hook — typically never ran.
+3. =whitespace-style= included =tabs spaces newline empty indentation=,
+   which would have highlighted *every* whitespace character, not just
+   trailing ones — way too noisy.
+
+Note: Doom's =:editor (whitespace +guess +trim)= module enables
+=ws-butler-mode=, which only trims whitespace on lines you have
+actually edited.  The setup below is more aggressive — it strips
+*all* trailing whitespace on save.  =delete-trailing-whitespace=
+runs after =ws-butler= so the net effect is full trim.
+
+** Setup
+
+#+BEGIN_SRC emacs-lisp
+(defun my/setup-trailing-whitespace ()
+  "Show trailing whitespace and strip it on save in this buffer."
+  (setq show-trailing-whitespace t)
+  (add-hook 'before-save-hook #'delete-trailing-whitespace nil t))
+
+(add-hook 'text-mode-hook #'my/setup-trailing-whitespace)
+(add-hook 'prog-mode-hook #'my/setup-trailing-whitespace)
+(add-hook 'conf-mode-hook #'my/setup-trailing-whitespace)
+#+END_SRC

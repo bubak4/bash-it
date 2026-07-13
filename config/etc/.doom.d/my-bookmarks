@@ -1,0 +1,107 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("000 *ROOT* /etc/"
+ ((filename . "/su:root@localhost:/etc/")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("010 [~] Downloads/"
+ ((filename . "~/Downloads")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("011 [~] src/mine"
+ ((filename . "~/src/mine")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("030 [ls] zvn"
+ ((filename . "~/zvn/livesystems/")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("031 [ls] tramp-locations"
+ ((filename . "~/zvn/livesystems/tramp-locations.el")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("050 [jl] martin@netopejr:/home/martin/"
+ ((filename . "/ssh:martin@netopejr.justlogin.cz:~")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("051 [jl] src/justlogin"
+ ((filename . "~/src/justlogin/")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("051 [jl] zvn/justlogin"
+ ((filename . "~/zvn/justlogin/")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("090 [ip] dain TODO"
+ ((filename . "~/zvn/dain/TODO.org")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("091 [ip] ispop/"
+ ((filename . "~/src/dain/ispop")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("092 [ip] config/"
+ ((filename . "~/src/dain/ispop/cz.dain/ispop/common/properties/src/main/")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("093 [ip] formrepository/"
+ ((filename . "~/src/dain/ispop/cz.dain/ispop/common/repository/formrepository/src/main/formrepository/")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("094 [ip] web service xsd/"
+ ((filename . "~/src/dain/ispop/cz.dain/ispop/common/facade/service.external/src/main/resources/xsd")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("095 [ip] release management ispop"
+ ((filename . "~/src/dain/ispop/cz.dain/ispop/src/release_management/")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("096 [ip] release management ispop-dev"
+ ((filename . "~/src/dain/ispop-dev/cz.dain/ispop/src/release_management/")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("097 [ip] user's login/passwd"
+ ((filename . "~/zvn/dain/ispop/2011-migrace-maly-ispop/cz.dain.ispop.agwapi.DummyAgwOperations.csv.gz")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+("098 [ir] isrep/"
+ ((filename . "~/src/dain/isrep/")
+  (front-context-string)
+  (rear-context-string)
+  (position . 1)
+  (annotation)))
+)

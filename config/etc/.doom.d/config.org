@@ -1,0 +1,51 @@
+#+TITLE: Doom Emacs entry-point config
+#+AUTHOR: martin@slouf.name
+#+PROPERTY: header-args:emacs-lisp :tangle yes :results none
+#+STARTUP: showeverything
+
+This file is tangled to =config.el= by Doom's =:config literate= module.
+Keep it minimal — the bulk of the configuration lives in =my-config.org=,
+which is loaded at the bottom of this file.
+
+* Identity
+
+Used by GPG, mail clients, file templates, snippets, etc.
+
+#+begin_src emacs-lisp
+(setq user-full-name "Martin Šlouf"
+      user-mail-address "martin@slouf.name")
+#+end_src
+
+* Theme
+
+#+begin_src emacs-lisp
+(setq doom-theme 'doom-one)
+#+end_src
+
+* Org directory
+
+Must be set before =org= loads.
+
+#+begin_src emacs-lisp
+(setq org-directory "~/org/")
+#+end_src
+
+* Line numbers
+
+Style of line numbers; ~nil~ disables them, ~'relative~ enables relative numbers.
+
+#+begin_src emacs-lisp
+(setq display-line-numbers-type t)
+#+end_src
+
+* Load private config
+
+The rest of the configuration is kept in =my-config.org= and loaded here.
+Doom's module =config.el= files have already been evaluated by this point,
+so =after!=, =use-package!=, =map!= etc. all work as expected inside
+=my-config.org=.
+
+#+begin_src emacs-lisp
+(require 'org)
+(org-babel-load-file (expand-file-name "my-config.org" doom-private-dir))
+#+end_src

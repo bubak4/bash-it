@@ -1,0 +1,17 @@
+# Old hand-rolled backups — superseded by git history
+*.backup
+
+# Emacs auto-saved tilde backups
+*~
+
+# Claude Code project state (transcripts, settings, todos)
+.claude/
+
+# Tangled output — regenerated from the .org sources
+# (config.el  ← config.org via Doom's :config literate module
+#  my-config.el ← my-config.org via org-babel-load-file in config.org)
+/config.el
+/my-config.el
+
+# Machine-specific Emacs session state (paths, buffer history)
+/my-emacs-desktop

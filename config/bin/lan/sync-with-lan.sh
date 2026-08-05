@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2025-02-09 22:29:49 martin>
+# Time-stamp: <2026-08-05 06:54:43 martin>
 # Synchronize local files with remote (lan) hosts.  Works only in one direction.
 
 target_hostnames="workbox.lan lanbox.lan"
@@ -50,4 +50,5 @@ for i in $target_hostnames ; do
     do_rsync ~/.emacs.d/upgrade.sh
     do_rsync ~/wrk/debian kernel
     do_rsync ~/.aws
+    do_rsync ~/.kube
 done

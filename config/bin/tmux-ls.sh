@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2026-08-05 06:36:43 martin>
+# Time-stamp: <2026-08-05 07:55:35 martin>
 
 session="LS"
 
@@ -14,7 +14,7 @@ ENTRIES=(
     "op-AI [BLM]:$HOME/src/livesystems/openplatform/blueprints/blueprint-live-model:claude"
     "op-test:$HOME/src/livesystems/openplatform/openplatform-test-suite:source .venv/bin/activate"
     "cy:$HOME/src/livesystems/cysensic/cysensic-orchestration"
-    "cy-AI:$HOME/src/livesystems/cysensic:claue"
+    "cy-AI:$HOME/src/livesystems/cysensic:claude"
     "spvs:$HOME/src/livesystems/spvs/openassets-orchestration"
     "lkp:$HOME/src/livesystems/lkp/lkp-orchestration"
     "oa:$HOME/src/livesystems/openassets/openassets-orchestration"

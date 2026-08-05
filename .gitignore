@@ -25,3 +25,6 @@ profiles/*
 
 /vendor/github.com/nojhan/liquidprompt
 .trunk/
+config/etc/.netrc
+config/etc/.netrc.notes
+config/etc/.netrc.bak

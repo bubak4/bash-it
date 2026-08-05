@@ -268,8 +268,8 @@ function __powerline_left_segment() {
 		fi
 	fi
 
-	#change here to cahnge fg color
-	LEFT_PROMPT+="$(set_color - "${params[1]:-}")${pad_before_segment}${params[0]}${normal?}"
+	#change here to change fg color
+	LEFT_PROMPT+="$(set_color "${POWERLINE_PROMPT_FOREGROUND_COLOR:--}" "${params[1]:-}")${pad_before_segment}${params[0]}${normal?}"
 	#seperator char color == current bg
 	LAST_SEGMENT_COLOR="${params[1]:-}"
 	((SEGMENTS_AT_LEFT += 1))
@@ -287,7 +287,6 @@ function __powerline_last_status_prompt() {
 
 function __powerline_prompt_command() {
 	local last_status="$?" ## always the first
-	local beginning_of_line='\[\e[G\]'
 	local info prompt_color segment prompt
 
 	local LEFT_PROMPT=""
@@ -330,5 +329,5 @@ function __powerline_prompt_command() {
 		prompt+=" "
 	fi
 
-	PS1="${beginning_of_line}${normal?}${LEFT_PROMPT}${prompt}"
+	PS1="${normal?}${LEFT_PROMPT}${prompt}"
 }

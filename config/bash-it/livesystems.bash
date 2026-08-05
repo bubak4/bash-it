@@ -1,10 +1,18 @@
 export GITLAB_URI=https://gitlab.livesystems.cz
 export GITLAB_TOKEN=glpat-BhjKp9EDS-HvYdsZbZ1x
 
-# source the completion for op (OpenPlatform management command)
-OP_COMPLETION=~/src/livesystems/openplatform/openplatform-orchestration/op-completion.bash
+# openplatform
+PATH="$HOME/src/livesystems/openplatform/openplatform-orchestration/docker:$PATH"
+OP_COMPLETION="$HOME/src/livesystems/openplatform/openplatform-orchestration/op-completion.bash"
 if test -f "$OP_COMPLETION" ; then
     source "$OP_COMPLETION"
+fi
+
+# live-model
+PATH="$HOME/.live-model/bin:$PATH"
+LM_COMPLETION="$HOME/.live-model/etc/lm-completion.bash"
+if test -f "$LM_COMPLETION" ; then
+    source "$LM_COMPLETION"
 fi
 
 function ls-git-repo-setup()

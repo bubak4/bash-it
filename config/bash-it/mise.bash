@@ -12,3 +12,8 @@ fi
 #mise use -g kubectl
 # install specific version
 #mise use -g kubectl@1.36.2
+
+# auto-complete for kubectl if installed
+if command -v kubectl > /dev/null ; then
+    source <(kubectl completion bash)
+fi

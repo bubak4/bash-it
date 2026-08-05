@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2026-05-20 06:07:25 martin>
+# Time-stamp: <2026-08-05 06:36:43 martin>
 
 session="LS"
 
@@ -8,16 +8,18 @@ session="LS"
 # associative arrays don't preserve insertion order — the loop below
 # iterates in the order declared here, which controls tmux window order.
 ENTRIES=(
-    "op:$HOME/src/livesystems/openplatform/openplatform-orchestration"
+    "op:$HOME/src/livesystems/openplatform/openplatform-orchestration/docker"
     "op-AI [A]:$HOME/src/livesystems/openplatform:claude"
     "op-AI [B]:$HOME/src/livesystems/openplatform:claude"
+    "op-AI [BLM]:$HOME/src/livesystems/openplatform/blueprints/blueprint-live-model:claude"
     "op-test:$HOME/src/livesystems/openplatform/openplatform-test-suite:source .venv/bin/activate"
     "cy:$HOME/src/livesystems/cysensic/cysensic-orchestration"
-    "cy-AI:$HOME/src/livesystems/cysensic"
+    "cy-AI:$HOME/src/livesystems/cysensic:claue"
     "spvs:$HOME/src/livesystems/spvs/openassets-orchestration"
     "lkp:$HOME/src/livesystems/lkp/lkp-orchestration"
     "oa:$HOME/src/livesystems/openassets/openassets-orchestration"
     "ppas:$HOME/src/livesystems/ppas/ppas-orchestration"
+    "pre:$HOME/src/livesystems/pre/pre-orchestration"
 )
 
 tmux new-session -d -s "$session"

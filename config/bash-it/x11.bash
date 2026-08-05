@@ -31,18 +31,18 @@ function x-screenshot()
 
 function x-screenshot-jpg() { screenshot "screenshot" "jpg" ; }
 
-function x-screensaver-on()
+function x-blank-on()
 {
     xset +dpms
     xset s on
-    pkill -SIGCONT -U $(id -u) xscreensaver
+    echo "I: screen blanking re-enabled (dpms + screensaver on)"
 }
 
-function x-screensaver-off()
+function x-blank-off()
 {
     xset -dpms
     xset s off
-    pkill -SIGSTOP -U $(id -u) xscreensaver
+    echo "I: screen blanking disabled (dpms + screensaver off)"
 }
 
 function x-kb-reset() {

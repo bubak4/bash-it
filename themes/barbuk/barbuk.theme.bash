@@ -106,7 +106,7 @@ function __git-upstream-remote-logo_prompt() {
 
 function git_prompt_info() {
 	git_prompt_vars
-	echo -e "on $SCM_GIT_CHAR_ICON_BRANCH $SCM_PREFIX$SCM_BRANCH$SCM_STATE$SCM_GIT_AHEAD$SCM_GIT_BEHIND$SCM_GIT_STASH$SCM_SUFFIX "
+	echo "on $SCM_GIT_CHAR_ICON_BRANCH $SCM_PREFIX$SCM_BRANCH$SCM_STATE$SCM_GIT_AHEAD$SCM_GIT_BEHIND$SCM_GIT_STASH$SCM_SUFFIX "
 }
 
 function __exit_prompt() {
@@ -194,7 +194,12 @@ function __python_venv_prompt() {
 	elif [[ -n "${VIRTUAL_ENV_PROMPT:-}" ]]; then
 		python_info="${VIRTUAL_ENV_PROMPT}"
 	elif [[ -f pyproject.toml ]]; then
-		python_info=$(awk -F'"' '/^requires-python/ {print $2}' pyproject.toml)
+		# pyproject.toml has no character restrictions on this field, unlike a
+		# git ref name. Strip anything outside printable ASCII (raw control
+		# characters, e.g. terminal escape sequences) as well as literal
+		# backslash-letter escape sequences written as text (e.g. "\e]...\a"),
+		# which some shells/echo modes can still expand.
+		python_info=$(awk -F'"' '/^requires-python/ {gsub(/[^\40-\176]|\\[a-zA-Z]/, "", $2); print $2}' pyproject.toml)
 		[[ -z "${python_info}" ]] && python_info="py"
 	fi
 
@@ -210,7 +215,7 @@ function __uv_prompt() {
 }
 
 function __pre_commit_prompt() {
-	if [[ -f .pre-commit-config.yaml ]]; then
+	if [[ -f .pre-commit-config.yaml ]] || [[ -f .pre-commit-config.yml ]]; then
 		local icon="${PRE_COMMIT_CHAR}"
 		if [[ -f .git/hooks/pre-commit ]]; then
 			if grep -q "prek" .git/hooks/pre-commit 2> /dev/null; then
@@ -246,7 +251,12 @@ function __docker_prompt() {
 		if [ -n "$DOCKER_CONTEXT" ]; then
 			docker_context="$DOCKER_CONTEXT"
 		elif [ -n "$DOCKER_HOST" ]; then
-			docker_context="$DOCKER_HOST"
+			if [[ $DOCKER_HOST = *podman.sock ]]; then
+				DOCKER_CHAR=" "
+				docker_context="podman"
+			else
+				docker_context="$DOCKER_HOST"
+			fi
 		elif [ -f .env ] && grep -qF COMPOSE_PROJECT_NAME .env; then
 			docker_context=$(awk -F'[ \t\n=]+' '/COMPOSE_PROJECT_NAME/ {print $2; exit}' .env)
 		fi
@@ -312,6 +322,7 @@ function __prompt-command() {
 	for segment in $BARBUK_PROMPT; do
 		local info
 		info="$(__"${segment}"_prompt)"
+		info="${info//[[:cntrl:]]/}"
 		[[ -n "${info}" ]] && PS1+="${info}"
 	done
 

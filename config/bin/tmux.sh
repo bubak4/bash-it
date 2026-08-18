@@ -14,8 +14,8 @@ which multitail && [[ -f /var/log/syslog ]] && \
     tmux new-window -n "syslog" -t main "sudo multitail --follow-all --mergeall /var/log/syslog"
 
 # htop
-which htop && \
-    tmux new-window -n "htop" -t main 'htop'
+#which htop && \
+#    tmux new-window -n "htop" -t main 'htop'
 
 # x11vnc
 ( [[ -n "$DISPLAY" ]] && which x11vnc ) && \

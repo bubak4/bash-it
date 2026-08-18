@@ -117,7 +117,9 @@ function x-wallpaper()
 {
     local wallpaper=${WALLPAPER:-""}
     if test -z "$wallpaper" ; then
-        local wallpaper=dusnice-2025-11-kotel-3840x2160.jpg
+        #local wallpaper=dusnice-2026-03-kotel-deti-I-2880x1800.png
+        local wallpaper=dusnice-2026-03-kotel-deti-II-2880x1800.png
+        #local wallpaper=dusnice-2025-11-kotel-3840x2160.jpg
         #local wallpaper=galadriel-1440x900.jpg
         #local wallpaper=sc2_hyperion-1680x1050.jpg
         #local wallpaper=sc2_hyperion2-1680x1050.jpg

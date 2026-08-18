@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Available to non-interactive shells too (tools, not bash-it cosmetics). MUST stay ABOVE the interactive
+# guard below, which returns early for non-interactive shells (so everything under it - bash-it, mise - is
+# skipped). Puts the mise shims (kubectl/helm/kubeseal/node/...) + local bins on PATH for scripts and tools.
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$HOME/bin:$PATH"
+
 # If not running interactively, don't do anything
 case $- in
   *i*) ;;

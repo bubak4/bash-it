@@ -28,3 +28,16 @@ profiles/*
 config/etc/.netrc
 config/etc/.netrc.notes
 config/etc/.netrc.bak
+
+# python bytecode (config/accounts)
+*.pyc
+__pycache__/
+
+# account data -- never tracked, not even encrypted. Distributed between
+# hosts by config/bin/lan/sync-with-lan.sh instead. The matching
+# filter=git-crypt lines in .gitattributes stay as a safety net, so an
+# accidental `git add -f` encrypts rather than commits in the clear.
+config/accounts/accounts.xml
+config/accounts/internet_registrace.txt
+# generated per-host by config/install.sh
+config/.install-secret

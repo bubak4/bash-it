@@ -1,0 +1,10 @@
+<!-- -->
+<!ELEMENT accounts (account*)>
+<!ELEMENT account EMPTY>
+<!ATTLIST account
+  url CDATA #REQUIRED
+  type (www|other) "www"
+  login_url CDATA ""
+  login_name CDATA #REQUIRED
+  password   CDATA #REQUIRED
+  note CDATA "">

@@ -8,3 +8,10 @@
 
 # Windows files
 *.bat text eol=crlf
+
+# Encrypted with git-crypt (see .git-crypt/). Only the data files are
+# encrypted -- the scripts beside them stay readable so they still diff and
+# review like normal code.
+config/.install-secret filter=git-crypt diff=git-crypt
+config/accounts/accounts.xml filter=git-crypt diff=git-crypt
+config/accounts/internet_registrace.txt filter=git-crypt diff=git-crypt

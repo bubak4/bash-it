@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2026-08-05 07:55:35 martin>
+# Time-stamp: <2026-09-21 20:21:44 martin>
 
 session="LS"
 
@@ -9,9 +9,10 @@ session="LS"
 # iterates in the order declared here, which controls tmux window order.
 ENTRIES=(
     "op:$HOME/src/livesystems/openplatform/openplatform-orchestration/docker"
-    "op-AI [A]:$HOME/src/livesystems/openplatform:claude"
-    "op-AI [B]:$HOME/src/livesystems/openplatform:claude"
-    "op-AI [BLM]:$HOME/src/livesystems/openplatform/blueprints/blueprint-live-model:claude"
+    "op-AI:$HOME/src/livesystems/openplatform:claude"
+    "op2:$HOME/src/livesystems/openplatform/openplatform-orchestration/docker"
+    "op2-AI:$HOME/src/livesystems/openplatform:claude"
+    "op-blm-AI:$HOME/src/livesystems/openplatform/blueprints/blueprint-live-model:claude"
     "op-test:$HOME/src/livesystems/openplatform/openplatform-test-suite:source .venv/bin/activate"
     "cy:$HOME/src/livesystems/cysensic/cysensic-orchestration"
     "cy-AI:$HOME/src/livesystems/cysensic:claude"

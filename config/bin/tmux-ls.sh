@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2026-09-22 21:41:53 martin>
+# Time-stamp: <2026-09-22 21:44:07 martin>
 
 session="LS"
 
@@ -11,7 +11,7 @@ ENTRIES=(
     "op:$HOME/src/livesystems/openplatform/openplatform-orchestration/docker"
     "op-ai:$HOME/src/livesystems/openplatform:claude"
     "op2-ai:$HOME/src/livesystems/openplatform:claude"
-    "op2:$HOME/src/livesystems/openplatform/openplatform-orchestration/docker"
+    "op2:$HOME/src/livesystems/openplatform-2/openplatform-orchestration/docker"
     "op-test:$HOME/src/livesystems/openplatform/openplatform-test-suite:source .venv/bin/activate"
     "oa:$HOME/src/livesystems/openassets/openassets-orchestration"
     "oa-ai:$HOME/src/livesystems/openassets:claude"

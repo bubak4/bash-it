@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2026-09-10 11:51:33 martin>
+# Time-stamp: <2026-09-22 15:53:43 martin>
 # Synchronize local files with remote (lan) hosts.  Works only in one direction.
 
 target_hostnames="workbox.lan lanbox.lan"
@@ -43,7 +43,9 @@ for i in $target_hostnames ; do
     target_hostname=$i
 
     do_rsync ~/.bash-it/sync-with-upstream.sh
-    do_rsync ~/.bash-it/config/accounts
+    # only the data file: the scripts beside it come from git, and it is
+    # gitignored, so rsync is the only thing carrying it between hosts
+    do_rsync ~/.bash-it/config/accounts/accounts.xml
     do_rsync ~/.ssh
     do_rsync ~/.gnupg
     do_rsync ~/.doom.d "*.backup"

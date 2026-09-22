@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2026-09-21 20:21:44 martin>
+# Time-stamp: <2026-09-22 14:10:39 martin>
 
 session="LS"
 
@@ -12,13 +12,13 @@ ENTRIES=(
     "op-AI:$HOME/src/livesystems/openplatform:claude"
     "op2:$HOME/src/livesystems/openplatform/openplatform-orchestration/docker"
     "op2-AI:$HOME/src/livesystems/openplatform:claude"
-    "op-blm-AI:$HOME/src/livesystems/openplatform/blueprints/blueprint-live-model:claude"
     "op-test:$HOME/src/livesystems/openplatform/openplatform-test-suite:source .venv/bin/activate"
+    "oa:$HOME/src/livesystems/openassets/openassets-orchestration"
+    "oa-AI:$HOME/src/livesystems/openassets:claude"
     "cy:$HOME/src/livesystems/cysensic/cysensic-orchestration"
     "cy-AI:$HOME/src/livesystems/cysensic:claude"
     "spvs:$HOME/src/livesystems/spvs/openassets-orchestration"
     "lkp:$HOME/src/livesystems/lkp/lkp-orchestration"
-    "oa:$HOME/src/livesystems/openassets/openassets-orchestration"
     "ppas:$HOME/src/livesystems/ppas/ppas-orchestration"
     "pre:$HOME/src/livesystems/pre/pre-orchestration"
 )

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2026-08-05 06:54:43 martin>
+# Time-stamp: <2026-09-10 11:51:33 martin>
 # Synchronize local files with remote (lan) hosts.  Works only in one direction.
 
 target_hostnames="workbox.lan lanbox.lan"
@@ -45,7 +45,7 @@ for i in $target_hostnames ; do
     do_rsync ~/.bash-it/sync-with-upstream.sh
     do_rsync ~/.bash-it/config/accounts
     do_rsync ~/.ssh
-    # do_rsync ~/.gnupg
+    do_rsync ~/.gnupg
     do_rsync ~/.doom.d "*.backup"
     do_rsync ~/.emacs.d/upgrade.sh
     do_rsync ~/wrk/debian kernel

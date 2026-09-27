@@ -95,7 +95,6 @@
       "Bash(halt:*)",
       "Bash(poweroff:*)",
       "Bash(mkfs:*)",
-      "Bash(mkfs.*:*)",
       "Bash(dd:*)",
       "Bash(fdisk:*)",
       "Bash(parted:*)",
@@ -106,7 +105,8 @@
       "Bash(find * -exec *)",
       "Bash(find * -execdir *)",
       "Bash(find * -delete*)"
-    ]
+    ],
+    "ask": []
   },
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": true,
@@ -126,7 +126,16 @@
       }
     }
   },
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
   "tui": "default",
   "skipWorkflowUsageWarning": true,
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
   "defaultMode": "plan"
 }

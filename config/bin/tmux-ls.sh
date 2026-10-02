@@ -1,5 +1,5 @@
 #!/bin/bash
-# Time-stamp: <2026-09-22 21:44:07 martin>
+# Time-stamp: <2026-10-02 12:31:15 martin>
 
 session="LS"
 
@@ -10,7 +10,7 @@ session="LS"
 ENTRIES=(
     "op:$HOME/src/livesystems/openplatform/openplatform-orchestration/docker"
     "op-ai:$HOME/src/livesystems/openplatform:claude"
-    "op2-ai:$HOME/src/livesystems/openplatform:claude"
+    "op2-ai:$HOME/src/livesystems/openplatform-2:claude"
     "op2:$HOME/src/livesystems/openplatform-2/openplatform-orchestration/docker"
     "op-test:$HOME/src/livesystems/openplatform/openplatform-test-suite:source .venv/bin/activate"
     "oa:$HOME/src/livesystems/openassets/openassets-orchestration"
@@ -20,7 +20,9 @@ ENTRIES=(
     "spvs:$HOME/src/livesystems/spvs/openassets-orchestration"
     "lkp:$HOME/src/livesystems/lkp/lkp-orchestration"
     "ppas:$HOME/src/livesystems/ppas/ppas-orchestration"
+    "ppas-ai:$HOME/src/livesystems/ppas:claude"
     "pre:$HOME/src/livesystems/pre/pre-orchestration"
+    "pre-ai:$HOME/src/livesystems/pre:claude"
 )
 
 tmux new-session -d -s "$session"

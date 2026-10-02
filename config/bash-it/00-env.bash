@@ -39,5 +39,4 @@ LIBVIRT_DEBUG=1
 
 export VIRSH_DEFAULT_CONNECT_URI LIBVIRT_DEBUG
 
-# modify PATH
-export PATH="$PATH:/home/martin/.local/bin"
+export PATH="$PATH:$HOME/.local/bin"

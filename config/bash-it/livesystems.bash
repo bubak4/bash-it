@@ -1,11 +1,14 @@
 export GITLAB_URI=https://gitlab.livesystems.cz
-export GITLAB_TOKEN=glpat-BhjKp9EDS-HvYdsZbZ1x
+# GITLAB_TOKEN lives in a git-crypt encrypted file; skipped while the repo is locked.
+LS_SECRETS="$BASH_IT/config/secrets/livesystems.env"
+if test -f "$LS_SECRETS" && ! head -c 9 "$LS_SECRETS" | grep -q GITCRYPT ; then
+    source "$LS_SECRETS"
+fi
 
 # openplatform
 PATH="$HOME/src/livesystems/openplatform/openplatform-orchestration/docker:$PATH"
-OP_COMPLETION="$HOME/src/livesystems/openplatform/openplatform-orchestration/op-completion.bash"
-if test -f "$OP_COMPLETION" ; then
-    source "$OP_COMPLETION"
+if command -v op >/dev/null ; then
+    eval "$(op completion bash)"
 fi
 
 # live-model

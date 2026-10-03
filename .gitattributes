@@ -15,3 +15,4 @@
 config/.install-secret filter=git-crypt diff=git-crypt
 config/accounts/accounts.xml filter=git-crypt diff=git-crypt
 config/accounts/internet_registrace.txt filter=git-crypt diff=git-crypt
+config/secrets/* filter=git-crypt diff=git-crypt

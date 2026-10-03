@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+# vnc-home <host> -- VNC to one of our machines' virtual desktop (:1),
+# served by msn-vnc-server (TLS-encrypted, no SSH tunnel needed).
+#
+#   at home  <host>.lan  direct over the LAN
+#   away     <host>.wg   over WireGuard (home-wg, via the aws hub)
+#
+# .lan wins when its port 5901 answers within a second; at home .wg would
+# work too but detours through aws.
+#
+# Login: TLSVnc with the per-host VNC password file
+# ~/.vnc/vncpasswd-<host> (one click). Without that file the viewer asks
+# for user name + Unix password (TLSPlain).
+
+set -eu
+
+host=${1:?usage: vnc-home <host>   e.g. vnc-home workbox}
+port=5901
+
+if timeout 1 bash -c "exec 3<>/dev/tcp/$host.lan/$port" 2>/dev/null; then
+    target=$host.lan
+else
+    target=$host.wg
+fi
+
+pw=$HOME/.vnc/vncpasswd-$host
+if [ -s "$pw" ]; then
+    exec vncviewer -SecurityTypes TLSVnc -passwd "$pw" "$target:$port"
+fi
+exec vncviewer -SecurityTypes TLSPlain,TLSVnc "$target:$port"

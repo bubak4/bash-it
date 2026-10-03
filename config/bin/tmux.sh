@@ -17,9 +17,11 @@ which multitail && [[ -f /var/log/syslog ]] && \
 #which htop && \
 #    tmux new-window -n "htop" -t main 'htop'
 
-# x11vnc
-( [[ -n "$DISPLAY" ]] && which x11vnc ) && \
-    tmux new-window -n "x11vnc" -t main 'while true ; do x11vnc -rfbport 5900 ; done'
+# x11vnc -- disabled 2026-10-03: it shared the real desktop without a
+# password on 0.0.0.0:5900, i.e. to every network the laptop is on. VNC goes
+# to the planned msn-vnc-server package (password + TLS, firewall-limited).
+#( [[ -n "$DISPLAY" ]] && which x11vnc ) && \
+#    tmux new-window -n "x11vnc" -t main 'while true ; do x11vnc -rfbport 5900 ; done'
 
 # bookworm chroot (i386)
 #which schroot && [[ -f /etc/schroot/chroot.d/bookworm.conf ]] && \
